@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+"use client";
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { TopBar } from '@/components/Navigation';
 
 type SearchParams = {
@@ -15,6 +18,8 @@ export default function QuizResultPage({
 }: {
   searchParams: SearchParams;
 }) {
+  const [loading, setLoading] = useState(true);
+
   const language =
     typeof searchParams.language === 'string' ? searchParams.language.toLowerCase() : 'igbo';
   const level =
@@ -38,6 +43,36 @@ export default function QuizResultPage({
 
   const isHomeNext = nextLevel === 'home';
   const scorePercentage = total > 0 ? Math.round((score / total) * 100) : 0;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-surface">
+        <TopBar title="Quiz Complete!" homeLink />
+        <main className="mt-20 pb-12 px-5 max-w-[480px] mx-auto w-full flex flex-col items-center justify-center min-h-[calc(100vh-200px)] gap-6">
+          <div className="w-full flex flex-col items-center gap-6 mt-5">
+            <div className="w-20 h-20 bg-surface-container-low rounded-full animate-pulse" />
+            <div className="space-y-2 text-center">
+              <div className="h-8 bg-surface-container-low rounded-lg animate-pulse w-48" />
+              <div className="h-4 bg-surface-container-low rounded-lg animate-pulse w-32" />
+            </div>
+            <div className="w-full rounded-3xl border-2 border-outline-variant bg-white p-8 animate-pulse">
+              <div className="h-6 bg-surface-container-low rounded-lg w-32 mx-auto mb-4" />
+              <div className="h-4 bg-surface-container-low rounded-lg w-40 mx-auto mb-6" />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="h-16 bg-surface-container-low rounded-2xl" />
+                <div className="h-16 bg-surface-container-low rounded-2xl" />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-surface">

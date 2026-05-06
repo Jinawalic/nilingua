@@ -7,15 +7,22 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { TopBar } from '@/components/Navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
     router.push('/home');
   };
 
@@ -59,9 +66,17 @@ export default function LoginPage() {
 
           <button 
             type="submit" 
-            className="tactile-button-primary w-full h-14 text-lg"
+            disabled={loading}
+            className="tactile-button-primary w-full h-14 text-lg disabled:opacity-70 flex items-center justify-center gap-2"
           >
-            Login
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Signing In...
+              </>
+            ) : (
+              'Login'
+            )}
           </button>
         </form>
 

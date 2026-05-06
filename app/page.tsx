@@ -6,8 +6,33 @@
 "use client";
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function Landing() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="relative min-h-screen w-full flex items-center justify-center">
+        <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.96),_rgba(248,250,255,0.96)_40%,_rgba(226,232,240,0.95)_100%)]" />
+        <div className="relative flex flex-col items-center gap-6">
+          <div className="w-24 h-24 bg-primary rounded-2xl animate-pulse flex items-center justify-center">
+            <span className="text-4xl">🇳🇬</span>
+          </div>
+          <div className="space-y-2 text-center">
+            <div className="h-8 bg-surface-container-low rounded-lg animate-pulse w-48 mx-auto" />
+            <div className="h-4 bg-surface-container-low rounded-lg animate-pulse w-64 mx-auto" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen w-full">
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.96),_rgba(248,250,255,0.96)_40%,_rgba(226,232,240,0.95)_100%)]" />

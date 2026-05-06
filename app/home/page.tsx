@@ -6,9 +6,44 @@
 "use client";
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { TopBar, BottomBar } from '@/components/Navigation';
 
 export default function HomePage() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-surface">
+        <TopBar streak={5} />
+        <main className="mt-20 pb-32 px-5 max-w-[480px] mx-auto space-y-8 w-full">
+          <div className="space-y-1">
+            <div className="h-8 bg-surface-container-low rounded-lg animate-pulse w-64" />
+            <div className="h-4 bg-surface-container-low rounded-lg animate-pulse w-48" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white rounded-xl p-6 animate-pulse">
+              <div className="h-12 w-12 bg-surface-container-low rounded-full mx-auto mb-4" />
+              <div className="h-6 bg-surface-container-low rounded-lg w-16 mx-auto mb-2" />
+              <div className="h-3 bg-surface-container-low rounded-lg w-20 mx-auto" />
+            </div>
+            <div className="bg-white rounded-xl p-6 animate-pulse">
+              <div className="h-4 bg-surface-container-low rounded-lg w-full mb-4" />
+              <div className="h-6 bg-surface-container-low rounded-lg w-16 mb-2" />
+              <div className="h-3 bg-surface-container-low rounded-lg w-full" />
+            </div>
+          </div>
+        </main>
+        <BottomBar />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-surface">
       <TopBar streak={5} />

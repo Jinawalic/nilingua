@@ -50,6 +50,7 @@ export default function QuizPage() {
   const [score, setScore] = useState(0);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
@@ -84,7 +85,7 @@ export default function QuizPage() {
     }
   };
 
-  const handleFooterClick = () => {
+  const handleFooterClick = async () => {
     if (!isLastQuestion) {
       setCurrentIndex((prev) => prev + 1);
       setSelected(null);
@@ -99,6 +100,10 @@ export default function QuizPage() {
 
     const totalQuestions = quizQuestions.length;
     const finalScore = (selected === currentQuestion.answerId) ? score + 1 : score;
+
+    setSubmitting(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     router.push(`/quiz-result?language=${language}&level=${level}&score=${finalScore}&total=${totalQuestions}`);
   };
 
@@ -163,11 +168,17 @@ export default function QuizPage() {
       <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] p-6 bg-white border-t-2 border-outline-variant z-50">
         <div className="max-w-[480px] mx-auto">
           <button
-            disabled={selected === null}
+            disabled={selected === null || submitting}
             onClick={handleFooterClick}
-            className={`tactile-button-primary w-full h-14 flex items-center justify-center gap-2 ${selected === null ? 'opacity-50 grayscale pointer-events-none' : ''}`}
+            aria-busy={submitting}
+            className={`tactile-button-primary w-full h-14 flex items-center justify-center gap-2 ${(selected === null || submitting) ? 'opacity-50 grayscale pointer-events-none' : ''}`}
           >
-            {isLastQuestion ? (
+            {submitting ? (
+              <>
+                <span className="h-5 w-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                Submitting...
+              </>
+            ) : isLastQuestion ? (
               <>
                 Check score
                 <span className="material-symbols-outlined">done_all</span>
