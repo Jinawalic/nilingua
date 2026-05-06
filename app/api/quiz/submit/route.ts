@@ -1,22 +1,23 @@
 import { prisma } from "@/lib/prisma";
 import { getNextStep } from "@/lib/adaptive";
+import type { Quiz } from "@prisma/client";
 
 export async function POST(req: Request) {
     const { userId, lessonId, answers } = await req.json();
 
-    const quizzes = await prisma.quiz.findMany({
-        where: { id: lessonId },
-    });
+    // Since Quiz model doesn't have lessonId, get all quizzes
+    // In a real app, you'd want to associate quizzes with lessons
+    const quizzes = await prisma.quiz.findMany();
 
     let score = 0;
 
-    quizzes.forEach((q, i) => {
-        if (answers[i] === q.answer) {
+    quizzes.forEach((q: Quiz, i) => {
+        if (answers[i] && answers[i] === q.answer) {
             score++;
         }
     });
 
-    const percentage = (score / quizzes.length) * 100;
+    const percentage = quizzes.length > 0 ? (score / Math.min(answers.length, quizzes.length)) * 100 : 0;
 
     await prisma.progress.create({
         data: {

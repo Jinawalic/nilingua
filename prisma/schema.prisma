@@ -21,10 +21,10 @@ model Lesson {
 }
 
 model Progress {
-  id       Int @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   userId   Int
   lessonId Int
-  score    Int
+  score    Float
 }
 
 model Quiz {
