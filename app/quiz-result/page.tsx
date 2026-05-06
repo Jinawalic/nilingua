@@ -3,20 +3,30 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-"use client";
-
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
 
-export const dynamic = 'force-dynamic';
+type SearchParams = {
+  [key: string]: string | string[] | undefined;
+};
 
-export default function QuizResultPage() {
-  const searchParams = useSearchParams();
-  const language = searchParams.get('language') || 'igbo';
-  const level = searchParams.get('level') || 'basic';
-  const score = parseInt(searchParams.get('score') || '0');
-  const total = parseInt(searchParams.get('total') || '3');
+export default function QuizResultPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const language =
+    typeof searchParams.language === 'string' ? searchParams.language : 'igbo';
+  const level =
+    typeof searchParams.level === 'string' ? searchParams.level : 'basic';
+  const score = parseInt(
+    typeof searchParams.score === 'string' ? searchParams.score : '0',
+    10
+  );
+  const total = parseInt(
+    typeof searchParams.total === 'string' ? searchParams.total : '3',
+    10
+  );
 
   const displayLanguage = language.charAt(0).toUpperCase() + language.slice(1);
   const displayLevel = level.charAt(0).toUpperCase() + level.slice(1);
