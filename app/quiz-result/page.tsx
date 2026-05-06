@@ -16,9 +16,9 @@ export default function QuizResultPage({
   searchParams: SearchParams;
 }) {
   const language =
-    typeof searchParams.language === 'string' ? searchParams.language : 'igbo';
+    typeof searchParams.language === 'string' ? searchParams.language.toLowerCase() : 'igbo';
   const level =
-    typeof searchParams.level === 'string' ? searchParams.level : 'basic';
+    typeof searchParams.level === 'string' ? searchParams.level.toLowerCase() : 'basic';
   const score = parseInt(
     typeof searchParams.score === 'string' ? searchParams.score : '0',
     10
@@ -97,7 +97,7 @@ export default function QuizResultPage({
             ) : (
               <>
                 <Link
-                  href={`/languages/${language}/${nextLevel}`}
+                  href={`/languages/${language}`}
                   className="w-full rounded-xl bg-primary px-6 py-4 text-center font-bold uppercase tracking-[0.24em] text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                 >
                   Next Level

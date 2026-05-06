@@ -6,7 +6,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
 
 export const dynamic = 'force-dynamic';
@@ -52,10 +52,9 @@ export default function QuizPage() {
   const [toastVisible, setToastVisible] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const language = searchParams.get('language') || 'igbo';
-  const level = searchParams.get('level') || 'basic';
+  const language = 'igbo';
+  const level = 'basic';
 
   const currentQuestion = quizQuestions[currentIndex];
   const isLastQuestion = currentIndex === quizQuestions.length - 1;
