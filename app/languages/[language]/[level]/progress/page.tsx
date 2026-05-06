@@ -144,35 +144,27 @@ export default function LearningProgressPage() {
       <TopBar showBack onBack={() => router.back()} title={`${displayLanguage} - ${displayLevel}`} homeLink />
 
       <main className="mt-20 pb-2 px-5 max-w-[480px] mx-auto w-full flex flex-col gap-6">
-        <div className="rounded-xl border border-dashed border-primary/30 bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between gap-4">
+        <div className="rounded-xl border border-dashed border-primary/30 bg-white p-4">
+          <div className="flex items-center justify-between gap-2">
             <div>
               <p className="text-sm text-on-surface-variant uppercase tracking-[0.26em]">Lesson {lessonIndex}</p>
-              <h1 className="text-2xl font-bold text-on-surface mt-2">{selectedLesson.title}</h1>
-              <p className="text-sm text-on-surface-variant mt-2">{selectedLesson.description}</p>
+              <h1 className="text-xl font-bold text-on-surface">{selectedLesson.title}</h1>
+              <p className="text-sm text-on-surface-variant">{selectedLesson.description}</p>
             </div>
             <div className="rounded-xl bg-primary text-white px-4 py-2 text-sm font-bold">{displayLevel}</div>
           </div>
         </div>
 
         <div className="space-y-3">
-          {/* <div className="rounded-[32px] border border-primary/20 bg-primary-container/20 p-6 text-center">
-            <p className="text-sm text-on-surface-variant uppercase tracking-widest mb-3">Progress</p>
-            <div className="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
-              <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progress}%` }} />
-            </div>
-            <p className="text-sm font-bold text-primary mt-3">{currentCardIndex + 1} / {totalCards}</p>
-          </div> */}
-
-          <div className="rounded-xl border border-outline-variant bg-white p-8 text-center">
+          <div className="rounded-xl border border-outline-variant bg-white p-4 text-center">
             <p className="text-sm text-on-surface-variant uppercase tracking-widest mb-3">Word</p>
-            <p className="text-4xl font-bold text-on-surface">{currentCard.word}</p>
+            <p className="text-xl font-bold text-on-surface">{currentCard.word}</p>
             <p className="text-sm text-on-surface-variant italic mt-4">{currentCard.pronunciation}</p>
           </div>
 
-          <div className="rounded-xl border border-secondary/20 bg-secondary-container/20 p-6 text-center">
+          <div className="rounded-xl border border-secondary/20 bg-secondary-container/20 p-4 text-center">
             <p className="text-sm text-on-surface-variant uppercase tracking-widest mb-3">Meaning</p>
-            <p className="text-2xl font-bold text-on-surface">{currentCard.meaning}</p>
+            <p className="text-xl font-bold text-on-surface">{currentCard.meaning}</p>
           </div>
         </div>
 
@@ -188,7 +180,7 @@ export default function LearningProgressPage() {
           <button
             onClick={handleNext}
             disabled={isLastCard}
-            className="flex-1 rounded-xl border-2 border-outline-variant bg-white px-5 py-4 text-sm font-semibold text-on-surface shadow-sm hover:bg-surface-container-low transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 rounded-xl border-2 border-outline-variant bg-white px-5 py-4 text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
             <span className="material-symbols-outlined align-middle">arrow_forward</span>
@@ -198,7 +190,7 @@ export default function LearningProgressPage() {
         {isLastCard && (
           <Link
             href={`/languages/${language}/${level}/complete?lesson=${lessonId}`}
-            className="w-full rounded-3xl bg-primary px-6 py-4 text-center font-bold uppercase tracking-[0.24em] text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+            className="w-full rounded-xl bg-primary px-6 py-4 text-center font-bold uppercase tracking-[0.24em] text-white hover:shadow-sm transition-all flex items-center justify-center gap-2"
           >
             Finish Learning
             <span className="material-symbols-outlined">check_circle</span>

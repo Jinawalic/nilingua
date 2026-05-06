@@ -43,27 +43,27 @@ export default function LevelUnitSelectionPage() {
     <div className="flex flex-col min-h-screen bg-surface">
       <TopBar title={`Learn ${displayLanguage}`} homeLink />
 
-      <main className="mt-20 pb-32 px-5 max-w-[480px] mx-auto w-full flex flex-col gap-6">
-        <div className="rounded-[32px] border-2 border-dashed border-primary/40 bg-primary-container/10 p-6">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-primary text-white text-2xl font-bold shadow-lg">
+      <main className="mt-20 pb-32 px-5 max-w-[480px] mx-auto w-full flex flex-col gap-4">
+        <div className="rounded-xl border-2 border-dashed border-primary/40 bg-primary-container/10 p-4">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white text-xl font-bold">
             {shortCode}
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-on-surface">{displayLevel} Course</h1>
+            <h1 className="text-xl font-bold text-on-surface">{displayLevel} Course</h1>
             <p className="text-sm text-on-surface-variant mt-2">Select what you want to learn under the {displayLevel} unit.</p>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-2">
           {lessonUnits.map((unit, index) => (
             <Link
               key={unit.id}
               href={`/languages/${language}/${level}/progress?lesson=${unit.id}`}
-              className="group block rounded-3xl border-2 border-outline-variant bg-white p-5 shadow-sm transition duration-200 hover:border-primary hover:shadow-lg"
+              className="group block rounded-xl border-2 border-outline-variant bg-white p-4 transition duration-200 hover:border-primary hover:shadow-lg"
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container-low text-primary text-2xl">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-container-low text-primary text-xl">
                     <span className="material-symbols-outlined">{unit.icon}</span>
                   </div>
                   <div>

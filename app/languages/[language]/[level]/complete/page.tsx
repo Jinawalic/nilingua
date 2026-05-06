@@ -44,30 +44,30 @@ export default function CompletionPage() {
         <div className="w-full flex flex-col items-center gap-6 mt-5">
           {/* Celebration */}
           <div className="flex flex-col items-center gap-3">
-            <div className="text-6xl">👍</div>
-            <h1 className="text-3xl font-bold text-on-surface">Lesson Complete!</h1>
+            <div className="text-4xl">👍</div>
+            <h1 className="text-xl font-bold text-on-surface">Lesson Complete!</h1>
             <p className="text-on-surface-variant">You're mastering {displayLanguage}.</p>
           </div>
 
           {/* Milestone card */}
-          <div className="w-full rounded-3xl border-2 border-outline-variant bg-white p-8 text-center space-y-6">
+          <div className="w-full rounded-xl border-1 border-outline-variant bg-white p-4 text-center space-y-2">
             <div className="flex justify-center">
-              <div className="w-20 h-20 rounded-full bg-primary-container flex items-center justify-center text-4xl">
+              <div className="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-xl">
                 🏆
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-on-surface">New Milestone!</h2>
+              <h2 className="text-xl font-bold text-on-surface">New Milestone!</h2>
               <p className="text-sm text-on-surface-variant mt-2">You've completed {currentLessonIndex + 1} {displayLevel} lesson{currentLessonIndex + 1 !== 1 ? 's' : ''} this week.</p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-2xl bg-orange-100 p-4 text-center">
-                <p className="text-2xl font-bold text-orange-600">+20</p>
+              <div className="rounded-xl bg-orange-100 p-4 text-center">
+                <p className="text-xl font-bold text-orange-600">+20</p>
                 <p className="text-xs text-orange-700 font-semibold uppercase tracking-wider mt-2">XP Earned</p>
               </div>
-              <div className="rounded-2xl bg-blue-100 p-4 text-center">
-                <p className="text-2xl font-bold text-blue-600">2:30</p>
+              <div className="rounded-xl bg-blue-100 p-4 text-center">
+                <p className="text-xl font-bold text-blue-600">2:30</p>
                 <p className="text-xs text-blue-700 font-semibold uppercase tracking-wider mt-2">Time Spent</p>
               </div>
             </div>
@@ -79,33 +79,21 @@ export default function CompletionPage() {
               <>
                 <Link
                   href={`/languages/${language}/${level}/progress?lesson=${nextLessonId}`}
-                  className="w-full rounded-3xl bg-primary px-6 py-4 text-center font-bold uppercase tracking-[0.24em] text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                  className="w-full rounded-xl bg-primary px-6 py-4 text-center font-bold uppercase text-white hover:shadow-xl transition-all flex items-center justify-center gap-2"
                 >
                   Finish & Continue
                   <span className="material-symbols-outlined">arrow_forward</span>
                 </Link>
-                {/* <Link
-                  href={`/languages/${language}/${level}`}
-                  className="w-full rounded-3xl border-2 border-outline-variant px-6 py-4 text-center font-bold uppercase tracking-[0.24em] text-on-surface hover:bg-surface-container-low transition-all"
-                >
-                  Back to Lessons
-                </Link> */}
               </>
             ) : (
               <>
                 <Link
                   href={`/languages/${language}/${level}/summary`}
-                  className="w-full rounded-3xl bg-primary px-6 py-4 text-center font-bold uppercase tracking-[0.24em] text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                  className="w-full rounded-xl bg-primary px-6 py-4 text-center font-bold uppercase text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                 >
                   Finish & Continue
                   <span className="material-symbols-outlined">arrow_forward</span>
                 </Link>
-                {/* <Link
-                  href={`/languages/${language}/${level}`}
-                  className="w-full rounded-3xl border-2 border-outline-variant px-6 py-4 text-center font-bold uppercase tracking-[0.24em] text-on-surface hover:bg-surface-container-low transition-all"
-                >
-                  Back to Lessons
-                </Link> */}
               </>
             )}
           </div>

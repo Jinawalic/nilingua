@@ -13,9 +13,10 @@ export default function ProfilePage() {
     <div className="flex flex-col min-h-screen bg-surface">
       <TopBar title="Profile" />
       
-      <main className="mt-20 pb-32 px-6 max-w-[480px] mx-auto w-full space-y-8">
-        <div className="flex flex-col items-center gap-4 py-6">
-          <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden relative group">
+      <main className="mt-15 pb-32 px-6 max-w-[480px] mx-auto w-full space-y-3">
+        <div className="flex flex-col items-center gap-4 py-3">
+          <div className="flex gap-3 items-center">
+            <div className="w-20 h-20 rounded-full border-2 border-gray-300 overflow-hidden relative group">
             <img 
               src="https://api.dicebear.com/7.x/avataaars/svg?seed=John" 
               alt="Avatar" 
@@ -29,10 +30,11 @@ export default function ProfilePage() {
             <h1 className="text-2xl font-bold text-on-surface">John Doe</h1>
             <p className="text-on-surface-variant font-medium">Joined May 2026</p>
           </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white p-4 rounded-2xl border-2 border-outline-variant tactile-card flex items-center gap-3">
+          <div className="bg-white p-4 rounded-xl border-1 border-outline-variant tactile-card flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <span className="material-symbols-outlined">star</span>
             </div>
@@ -41,7 +43,7 @@ export default function ProfilePage() {
               <p className="text-lg font-bold text-on-surface">12,450</p>
             </div>
           </div>
-          <div className="bg-white p-4 rounded-2xl border-2 border-outline-variant tactile-card flex items-center gap-3">
+          <div className="bg-white p-4 rounded-xl border-1 border-outline-variant tactile-card flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500">
               <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>local_fire_department</span>
             </div>
@@ -52,25 +54,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <section className="space-y-4">
-          <h2 className="text-xl font-bold text-on-surface px-1">Achievements</h2>
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              { name: 'Fast Learner', icon: 'speed', color: 'bg-blue-100 text-blue-600' },
-              { name: 'Word Master', icon: 'menu_book', color: 'bg-green-100 text-green-600' },
-              { name: 'Social Fly', icon: 'groups', color: 'bg-purple-100 text-purple-600' },
-            ].map((ach, i) => (
-              <div key={i} className="flex flex-col items-center gap-2">
-                <div className={`w-16 h-16 rounded-2xl ${ach.color} flex items-center justify-center shadow-sm`}>
-                  <span className="material-symbols-outlined text-3xl">{ach.icon}</span>
-                </div>
-                <span className="text-[10px] font-bold text-center leading-tight">{ach.name}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="bg-white rounded-2xl border-2 border-outline-variant overflow-hidden">
+        <section className="bg-white rounded-xl border-1 border-outline-variant overflow-hidden">
           {[
             { label: 'Edit Profile', icon: 'person_edit' },
             { label: 'Language Settings', icon: 'language' },

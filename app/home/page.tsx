@@ -48,26 +48,26 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen bg-surface">
       <TopBar streak={5} />
 
-      <main className="mt-20 pb-32 px-5 max-w-[480px] mx-auto space-y-8 w-full">
+      <main className="mt-20 pb-32 px-5 max-w-[480px] mx-auto space-y-3 w-full">
         <section className="space-y-1">
-          <h2 className="text-3xl font-bold text-on-surface">Good Morning, John</h2>
+          <h2 className="text-xl font-bold text-on-surface">Good Morning, John</h2>
           <p className="text-on-surface-variant font-medium">Ready for your daily Nigerian language fix?</p>
         </section>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl p-6 tactile-card flex flex-col items-center justify-center space-y-2">
-            <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center shadow-sm">
+          <div className="bg-white rounded-xl p-4 tactile-card flex flex-col items-center justify-center space-y-2">
+            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center shadow-sm">
               <span className="material-symbols-outlined text-orange-500" style={{ fontVariationSettings: "'FILL' 1" }}>
                 local_fire_department
               </span>
             </div>
             <div className="text-center">
-              <span className="text-2xl font-bold text-on-surface">5</span>
+              <span className="text-xl font-bold text-on-surface">5</span>
               <p className="text-[10px] font-bold text-outline uppercase tracking-widest leading-none mt-1">Day Streak</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 tactile-card space-y-4 flex flex-col justify-between">
+          <div className="bg-white rounded-xl p-4 tactile-card space-y-4 flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="material-symbols-outlined text-primary">bolt</span>
               <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Level 4</span>
@@ -77,8 +77,8 @@ export default function HomePage() {
                 <span className="text-xl font-bold text-on-surface">1,240</span>
                 <span className="text-[10px] font-bold text-on-surface-variant">/ 1,500 XP</span>
               </div>
-              <div className="h-3 w-full bg-surface-variant rounded-full overflow-hidden relative">
-                <div className="h-full bg-primary-container w-[82%] relative">
+              <div className="h-2 w-full bg-surface-variant rounded-full overflow-hidden relative">
+                <div className="h-full bg-primary w-[82%] relative">
                   {/* Progress shine effect can be added to globals.css if needed */}
                 </div>
               </div>
@@ -88,10 +88,10 @@ export default function HomePage() {
 
         <section className="space-y-4">
           <h3 className="text-xl font-bold text-on-surface">Current Course</h3>
-          <div className="relative overflow-hidden bg-primary-container/10 border-2 border-primary rounded-xl p-6 space-y-6">
+          <div className="relative overflow-hidden bg-primary-container/10 border-1 border-primary rounded-xl p-4 space-y-4">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center text-white text-3xl font-bold shadow-md">
+                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white text-xl font-bold ">
                   🇳🇬
                 </div>
                 <div>
@@ -99,13 +99,13 @@ export default function HomePage() {
                   <p className="text-on-primary-container font-medium">Intermediate Level</p>
                 </div>
               </div>
-              <div className="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">
+              <div className="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full">
                 45%
               </div>
             </div>
             <Link
               href="/lessons"
-              className="tactile-button-primary w-full py-4 flex items-center justify-center gap-2 text-center"
+              className="tactile-button-primary w-full py-2 flex items-center justify-center gap-2 text-center"
             >
               Continue Learning
               <span className="material-symbols-outlined">play_circle</span>
@@ -118,7 +118,7 @@ export default function HomePage() {
             <h3 className="text-xl font-bold text-on-surface">Other Languages</h3>
             <button className="text-primary text-[10px] font-bold tracking-widest uppercase">View All</button>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-2">
             {[
               { name: 'Igbo', id: 'igbo', sub: 'Language of the Igbo people', icon: 'language', color: 'text-secondary' },
               { name: 'Hausa', id: 'hausa', sub: 'Language of the Hausa people', icon: 'language', color: 'text-tertiary' },
@@ -126,10 +126,10 @@ export default function HomePage() {
               <Link
                 key={i}
                 href={`/languages/${topic.id}`}
-                className="bg-white border-2 border-outline-variant rounded-xl p-4 flex items-center justify-between tactile-card hover:shadow-lg hover:border-primary transition-all"
+                className="bg-white border-1 border-outline-variant rounded-xl p-4 flex items-center justify-between tactile-card hover:shadow-lg hover:border-primary transition-all"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-surface-container-low flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center">
                     <span className={`material-symbols-outlined ${topic.color}`}>{topic.icon}</span>
                   </div>
                   <div>
@@ -143,7 +143,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="bg-secondary/5 rounded-2xl p-6 border-2 border-dashed border-secondary/30 relative overflow-hidden">
+        <section className="bg-secondary/5 rounded-xl p-4 border-1 border-dashed border-secondary/30 relative overflow-hidden">
           <div className="flex gap-4">
             <span className="material-symbols-outlined text-secondary text-3xl">lightbulb</span>
             <div className="space-y-2">

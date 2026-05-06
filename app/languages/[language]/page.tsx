@@ -51,27 +51,27 @@ export default function LevelSelectionPage() {
     <div className="flex flex-col min-h-screen bg-surface">
       <TopBar title={`Learn ${displayLanguage}`} homeLink />
 
-      <main className="mt-20 pb-32 px-5 max-w-[480px] mx-auto w-full flex flex-col gap-8">
-        <div className="space-y-4 mt-6">
-          <div className="rounded-[32px] border border-primary/20 bg-primary-container/10 p-6">
-            <h1 className="text-3xl font-bold text-on-surface">Choose Your Level</h1>
+      <main className="mt-20 pb-32 px-5 max-w-[480px] mx-auto w-full flex flex-col gap-3">
+        <div className="space-y-2 mt-2">
+          <div className="rounded-xl border border-primary/20 bg-primary-container/10 p-4">
+            <h1 className="text-xl font-bold text-on-surface">Choose Your Level</h1>
             <p className="text-sm text-on-surface-variant mt-2">Select a level to start learning {displayLanguage}</p>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {levels.map((level) => (
             <Link
               key={level.id}
               href={`/languages/${language}/${level.id}`}
-              className={`${level.color} ${level.borderColor} border-2 rounded-3xl p-6 transition-shadow duration-200 hover:shadow-xl`}
+              className={`${level.color} ${level.borderColor} border-2 rounded-xl p-4 transition-shadow duration-200 hover:shadow-xl`}
             >
               <div className="flex items-center gap-4">
                 <div className="min-w-[52px] min-h-[52px] rounded-2xl bg-white/90 flex items-center justify-center text-3xl shadow-sm">
                   {level.icon}
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-semibold text-on-surface">{level.name}</h3>
+                  <h3 className="text-xl font-semibold text-on-surface">{level.name}</h3>
                   <p className="text-sm text-on-surface-variant mt-1">{level.description}</p>
                 </div>
               </div>
@@ -83,7 +83,7 @@ export default function LevelSelectionPage() {
           ))}
         </div>
 
-        <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-5 text-center">
+        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-4 text-center">
           <p className="text-sm text-on-surface-variant">
             💡 Start with Basic for the fastest progress, then move to Intermediate or Advanced when you are ready.
           </p>

@@ -29,36 +29,35 @@ export default function LevelSummaryPage() {
     <div className="flex flex-col min-h-screen bg-surface">
       <TopBar title={`${displayLanguage} - ${displayLevel} Complete`} homeLink />
 
-      <main className="mt-20 pb-12 px-5 max-w-[480px] mx-auto w-full flex flex-col items-center justify-center min-h-[calc(100vh-200px)] gap-6">
+      <main className="mt-15 pb-10 px-5 max-w-[480px] mx-auto w-full flex flex-col items-center justify-center min-h-[calc(100vh-200px)] gap-4">
         <div className="w-full flex flex-col items-center gap-6 mt-5">
           {/* Celebration */}
           <div className="flex flex-col items-center gap-3">
-            <div className="text-6xl">🎉</div>
-            <h1 className="text-3xl font-bold text-on-surface">Level Complete!</h1>
+            <h1 className="text-xl font-bold text-on-surface">Level Complete!</h1>
             <p className="text-on-surface-variant">You've mastered {displayLevel}!</p>
           </div>
 
           {/* Completion card */}
-          <div className="w-full rounded-3xl border-2 border-primary/30 bg-primary-container/20 p-8 text-center space-y-6">
+          <div className="w-full rounded-xl border-1 border-primary/30 bg-primary-container/20 p-4 text-center space-y-2">
             <div className="flex justify-center">
-              <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-5xl shadow-lg">
+              <div className="w-18 h-18 rounded-full bg-primary flex items-center justify-center text-5xl">
                 ⭐
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-on-surface">Congratulations!</h2>
+              <h2 className="text-xl font-bold text-on-surface">Congratulations!</h2>
               <p className="text-sm text-on-surface-variant mt-3 leading-relaxed">
                 You have successfully completed all lessons in the <span className="font-bold text-primary">{displayLevel}</span> level of {displayLanguage}!
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 pt-4">
-              <div className="rounded-2xl bg-gradient-to-br from-orange-100 to-orange-50 p-4 text-center border border-orange-200">
-                <p className="text-2xl font-bold text-orange-600">+100</p>
+              <div className="rounded-xl bg-gradient-to-br from-orange-100 to-orange-50 p-4 text-center border border-orange-200">
+                <p className="text-xl font-bold text-orange-600">+100</p>
                 <p className="text-xs text-orange-700 font-semibold uppercase tracking-wider mt-2">XP Total</p>
               </div>
-              <div className="rounded-2xl bg-gradient-to-br from-green-100 to-green-50 p-4 text-center border border-green-200">
-                <p className="text-2xl font-bold text-green-600">15</p>
+              <div className="rounded-xl bg-gradient-to-br from-green-100 to-green-50 p-4 text-center border border-green-200">
+                <p className="text-xl font-bold text-green-600">15</p>
                 <p className="text-xs text-green-700 font-semibold uppercase tracking-wider mt-2">Words Learned</p>
               </div>
             </div>
@@ -72,11 +71,11 @@ export default function LevelSummaryPage() {
           </div>
 
           {/* Action buttons */}
-          <div className="w-full space-y-3">
+          <div className="w-full space-y-2">
             {!isAdvanced && (
               <Link
                 href={`/quiz?language=${language}&level=${level}`}
-                className="w-full rounded-3xl bg-primary px-6 py-4 text-center font-bold uppercase tracking-[0.24em] text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                className="w-full rounded-xl bg-primary px-4 py-4 text-center font-bold uppercase tracking-[0.24em] text-white hover:shadow-xl transition-all flex items-center justify-center gap-2"
               >
                 Take Quiz
                 <span className="material-symbols-outlined">arrow_forward</span>
@@ -85,7 +84,7 @@ export default function LevelSummaryPage() {
           </div>
           <Link
             href="/home"
-            className="w-full rounded-xl border-1 border-outline-variant px-6 py-4 text-center font-bold uppercase tracking-[0.24em] text-on-surface hover:bg-surface-container-low transition-all"
+            className="w-full rounded-xl border-1 border-outline-variant px-4 py-4 text-center font-bold uppercase tracking-[0.24em] text-on-surface hover:bg-surface-container-low transition-all"
           >
             Back to Home
           </Link>
