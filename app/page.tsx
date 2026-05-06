@@ -56,13 +56,13 @@ export default function Landing() {
         <div className="w-full flex flex-col gap-2">
           <Link 
             href="/register"
-            className="tactile-button-primary w-full py-3 uppercase tracking-wide text-xl text-center"
+            className="tactile-button-primary w-full py-3 uppercase tracking-wide text-sm text-center"
           >
             Get Started
           </Link>
           <Link 
             href="/login"
-            className="tactile-button-secondary w-full py-3 uppercase tracking-wide text-xl text-center"
+            className="tactile-button-secondary w-full py-3 uppercase tracking-wide text-sm text-center"
           >
             I already have an account
           </Link>
@@ -70,7 +70,7 @@ export default function Landing() {
       </section>
 
       <section className="mb-3 w-full">
-        <h2 className="text-xl font-bold text-on-surface mb-5 text-center">I want to learn...</h2>
+        <h2 className="text-sm font-bold text-on-surface mb-5 text-center">I want to learn...</h2>
         <div className="grid grid-cols-1 gap-2">
           {[
             { id: 'hausa', name: 'Hausa', sub: 'Kano, Sokoto & more', color: 'bg-orange-100', icon: 'location_city', iconColor: 'text-orange-600' },
@@ -86,7 +86,7 @@ export default function Landing() {
                 <span className="material-symbols-outlined text-[40px]">{lang.icon}</span>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-on-surface">{lang.name}</h3>
+                <h3 className="text-sm font-bold text-on-surface">{lang.name}</h3>
                 <p className="text-outline text-sm">{lang.sub}</p>
               </div>
               <span className="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">
@@ -99,8 +99,8 @@ export default function Landing() {
 
       <section className="bg-surface-container-low rounded-xl p-4 mb-4 text-center border-1 border-outline-variant w-full">
         <span className="material-symbols-outlined text-primary text-[48px] mb-4">diversity_3</span>
-        <h2 className="text-xl font-bold text-on-surface mb-2">More than just words</h2>
-        <p className="text-on-surface-variant">
+        <h2 className="text-sm font-bold text-on-surface mb-2">More than just words</h2>
+        <p className="text-on-surface-variant text-sm">
           Dive into the history, music, and traditions that make these languages unique.
         </p>
       </section>

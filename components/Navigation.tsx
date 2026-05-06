@@ -31,7 +31,7 @@ export function TopBar({ onBack, showBack, title = 'Nilingua', onLogin, streak, 
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
         )}
-        <h1 className="text-xl font-black text-primary tracking-tight font-lexend">{title}</h1>
+        <h1 className="text-xl font-bold text-primary">{title}</h1>
       </div>
       
       <div className="flex items-center gap-2">

@@ -51,7 +51,7 @@ export default function HomePage() {
       <main className="mt-20 pb-32 px-5 max-w-[480px] mx-auto space-y-3 w-full">
         <section className="space-y-1">
           <h2 className="text-xl font-bold text-on-surface">Good Morning, John</h2>
-          <p className="text-on-surface-variant font-medium">Ready for your daily Nigerian language fix?</p>
+          <p className="text-on-surface-variant font-medium text-sm">Ready for your daily Nigerian language fix?</p>
         </section>
 
         <div className="grid grid-cols-2 gap-4">
@@ -62,7 +62,7 @@ export default function HomePage() {
               </span>
             </div>
             <div className="text-center">
-              <span className="text-xl font-bold text-on-surface">5</span>
+              <span className="text-sm font-bold text-on-surface">5</span>
               <p className="text-[10px] font-bold text-outline uppercase tracking-widest leading-none mt-1">Day Streak</p>
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function HomePage() {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between items-end">
-                <span className="text-xl font-bold text-on-surface">1,240</span>
+                <span className="text-sm font-bold text-on-surface">1,240</span>
                 <span className="text-[10px] font-bold text-on-surface-variant">/ 1,500 XP</span>
               </div>
               <div className="h-2 w-full bg-surface-variant rounded-full overflow-hidden relative">
@@ -87,7 +87,7 @@ export default function HomePage() {
         </div>
 
         <section className="space-y-4">
-          <h3 className="text-xl font-bold text-on-surface">Current Course</h3>
+          <h3 className="text-sm font-bold text-on-surface">Current Course</h3>
           <div className="relative overflow-hidden bg-primary-container/10 border-1 border-primary rounded-xl p-4 space-y-4">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-4">
@@ -95,7 +95,7 @@ export default function HomePage() {
                   🇳🇬
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-on-surface">Yoruba</h4>
+                  <h4 className="text-sm font-bold text-on-surface">Yoruba</h4>
                   <p className="text-on-primary-container font-medium">Intermediate Level</p>
                 </div>
               </div>
@@ -105,17 +105,17 @@ export default function HomePage() {
             </div>
             <Link
               href="/lessons"
-              className="tactile-button-primary w-full py-2 flex items-center justify-center gap-2 text-center"
+              className="text-sm tactile-button-primary w-full py-2 flex items-center justify-center gap-2 text-center"
             >
               Continue Learning
-              <span className="material-symbols-outlined">play_circle</span>
+              <span className="text-sm material-symbols-outlined">play_circle</span>
             </Link>
           </div>
         </section>
 
         <section className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold text-on-surface">Other Languages</h3>
+            <h3 className="text-sm   font-bold text-on-surface">Other Languages</h3>
             <button className="text-primary text-[10px] font-bold tracking-widest uppercase">View All</button>
           </div>
           <div className="space-y-2">
@@ -133,7 +133,7 @@ export default function HomePage() {
                     <span className={`material-symbols-outlined ${topic.color}`}>{topic.icon}</span>
                   </div>
                   <div>
-                    <h5 className="font-bold text-on-surface">{topic.name}</h5>
+                    <h5 className="font-bold text-on-surface text-sm">{topic.name}</h5>
                     <p className="text-xs text-on-surface-variant">{topic.sub}</p>
                   </div>
                 </div>
@@ -147,7 +147,7 @@ export default function HomePage() {
           <div className="flex gap-4">
             <span className="material-symbols-outlined text-secondary text-3xl">lightbulb</span>
             <div className="space-y-2">
-              <h6 className="text-sm font-bold text-secondary uppercase tracking-widest">Proverb of the Day</h6>
+              <h6 className="text-sm font-bold text-secondary capitalize tracking-widest">Proverb of the Day</h6>
               <p className="text-on-surface italic font-medium leading-relaxed">
                 "Ọmọ tí a kò kọ́, ni yóò gbé ilé tí a kọ́ tà."
               </p>
