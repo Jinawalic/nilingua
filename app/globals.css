@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-lexend: var(--font-lexend);
+
+  --color-primary: #264191;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #e8edff;
+  --color-on-primary-container: #264191;
+  
+  --color-secondary: #5a5f70;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #dfe2f9;
+  --color-on-secondary-container: #171b2c;
+
+  --color-tertiary: #75546f;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #ffd7f3;
+  --color-on-tertiary-container: #2b122a;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #410002;
+
+  --color-surface: #f8f9ff;
+  --color-on-surface: #191c20;
+  --color-surface-variant: #e1e2ec;
+  --color-on-surface-variant: #44474e;
+  
+  --color-outline: #74777f;
+  --color-outline-variant: #c4c6d0;
+
+  --color-surface-container-low: #f1f3f9;
+}
+
+@utility tactile-button-primary {
+  @apply bg-primary text-white font-bold rounded-xl border-b-4 border-[#1b2e65] active:border-b-0 active:translate-y-[2px] transition-all;
+}
+
+
+@utility tactile-button-secondary {
+  @apply bg-white text-primary font-bold rounded-xl border-2 border-b-4 border-outline-variant active:border-b-2 active:translate-y-[2px] transition-all;
+}
+
+@utility tactile-card {
+  @apply bg-white rounded-2xl border-2 border-b-4 border-outline-variant transition-all;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html {
+  background-color: #f0f2f0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-lexend), Arial, Helvetica, sans-serif;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  box-shadow: 0 0 50px rgba(0,0,0,0.05);
+  position: relative;
+}
+

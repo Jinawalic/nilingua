@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+}
+
+model Lesson {
+  id        Int    @id @default(autoincrement())
+  language  String
+  word      String
+  meaning   String
+}
+
+model Progress {
+  id       Int @id @default(autoincrement())
+  userId   Int
+  lessonId Int
+  score    Int
+}
+
+model Quiz {
+  id       Int    @id @default(autoincrement())
+  question String
+  optionA  String
+  optionB  String
+  optionC  String
+  optionD  String
+  answer   String
+}
