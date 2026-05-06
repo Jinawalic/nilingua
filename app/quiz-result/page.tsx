@@ -37,7 +37,7 @@ export default function QuizResultPage({
         'home';
 
   const isHomeNext = nextLevel === 'home';
-  const scorePercentage = Math.round((score / total) * 100);
+  const scorePercentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
   return (
     <div className="flex flex-col min-h-screen bg-surface">

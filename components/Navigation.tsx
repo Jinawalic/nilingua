@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Step } from '@/lib/types';
+"use client";
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
