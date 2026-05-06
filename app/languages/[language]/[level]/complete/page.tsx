@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
 
+export const dynamic = 'force-dynamic';
+
 const levelUnits: Record<string, Array<string>> = {
   basic: ['introduction', 'basic-greetings', 'family-members', 'numbers-1-10', 'common-phrases'],
   intermediate: ['conversation', 'travel', 'shopping'],

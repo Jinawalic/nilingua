@@ -9,6 +9,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
 
+export const dynamic = 'force-dynamic';
+
 const quizQuestions = [
   {
     question: 'Translate the phrase: "How are you?"',

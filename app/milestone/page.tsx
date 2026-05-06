@@ -8,6 +8,8 @@
 import { useRouter } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
 
+export const dynamic = 'force-dynamic';
+
 export default function MilestonePage() {
   const router = useRouter();
 

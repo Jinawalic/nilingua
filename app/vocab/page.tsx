@@ -9,6 +9,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
 
+export const dynamic = 'force-dynamic';
+
 export default function VocabPage() {
   const [selected, setSelected] = useState<number | null>(null);
   const router = useRouter();

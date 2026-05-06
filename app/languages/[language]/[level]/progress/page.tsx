@@ -10,6 +10,8 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { TopBar } from '@/components/Navigation';
 
+export const dynamic = 'force-dynamic';
+
 const levelUnits: Record<string, Array<{ id: string; title: string; description: string }>> = {
   basic: [
     { id: 'introduction', title: 'Introduction', description: 'Start with the core greetings and basic words.' },

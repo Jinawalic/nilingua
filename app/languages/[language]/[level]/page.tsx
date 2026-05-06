@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
 
+export const dynamic = 'force-dynamic';
+
 const levelUnits: Record<string, Array<{ id: string; title: string; subtitle: string; description: string; icon: string; status?: 'active' | 'locked' | 'completed' }>> = {
   basic: [
     { id: 'introduction', title: 'Introduction', subtitle: 'Lesson 1', description: 'Start with the core greetings and basic words.', icon: 'waving_hand', status: 'completed' },

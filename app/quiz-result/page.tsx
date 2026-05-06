@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
 
+export const dynamic = 'force-dynamic';
+
 export default function QuizResultPage() {
   const searchParams = useSearchParams();
   const language = searchParams.get('language') || 'igbo';
