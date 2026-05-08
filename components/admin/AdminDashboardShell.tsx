@@ -96,7 +96,7 @@ export default function AdminDashboardShell({
             <header className="flex items-start justify-between gap-4">
               <div>
                 {/* <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-primary/65">Overview</p> */}
-                <h2 className="mt-2 text-[30px] font-semibold tracking-[-0.05em] text-on-surface">Admin dashboard</h2>
+                <h2 className="mt-2 text-[25px] font-semibold tracking-[-0.05em] text-on-surface">Admin dashboard</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-on-surface-variant">
                   A clean, desktop-first workspace for monitoring Nilingua lessons, quizzes, vocabulary, and learner progress.
                 </p>
@@ -137,12 +137,12 @@ export default function AdminDashboardShell({
 
             <section className="grid grid-cols-1 gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
               <div className="flex flex-row gap-5">
-                <article className="rounded-xl border border-outline-variant bg-white p-6 shadow-[0_12px_30px_rgba(38,65,145,0.06)]">
+                <article className="rounded-xl border border-outline-variant bg-white p-6">
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-[22px] font-semibold tracking-[-0.03em] text-on-surface">Lesson Breakdown</h3>
+                    <h3 className="text-sm font-semibold tracking-[-0.03em] text-on-surface">Lesson Breakdown</h3>
                     <button
                       type="button"
-                      className="flex items-center gap-1 rounded-xl border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-primary"
+                      className="flex items-center gap-1 rounded-xl border border-outline-variant bg-surface px-2 py-1 text-sm font-semibold text-primary"
                     >
                       Today
                       <span className="material-symbols-outlined text-[18px]">expand_more</span>
@@ -150,9 +150,9 @@ export default function AdminDashboardShell({
                   </div>
 
                   <div className="mt-7 flex justify-center">
-                    <div className="relative h-56 w-56">
+                    <div className="relative h-36 w-36">
                       <div
-                        className="absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_rgba(36,65,145,0.08)]"
+                        className="absolute inset-0 rounded-full"
                         style={{ background: donutGradient }}
                       />
                       <div className="absolute inset-10 rounded-full border border-outline-variant/70 bg-surface" />
@@ -176,10 +176,10 @@ export default function AdminDashboardShell({
                 </article>
                 <article className="min-w-0 rounded-xl border border-outline-variant bg-white p-6 shadow-[0_12px_30px_rgba(38,65,145,0.06)]">
                 <div className="flex items-center justify-between gap-3">
-                  <h3 className="text-[22px] font-semibold tracking-[-0.03em] text-on-surface">Content Performance</h3>
+                  <h3 className="text-sm font-semibold tracking-[-0.03em] text-on-surface">Content Performance</h3>
                   <button
                     type="button"
-                    className="flex h-11 w-11 items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant"
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant"
                     aria-label="Performance options"
                   >
                     <span className="material-symbols-outlined text-[22px]">menu</span>
@@ -242,17 +242,6 @@ export default function AdminDashboardShell({
               </article>
               </div>
                   <RecentRegisteredTable users={[]} />
-            </section>
-
-            <section className="grid grid-cols-1 gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
-              
-
-              <div className="rounded-xl border border-outline-variant bg-white p-6 shadow-[0_12px_30px_rgba(38,65,145,0.06)]">
-                <p className="text-[22px] font-semibold tracking-[-0.03em] text-on-surface">Workspace notes</p>
-                <p className="mt-4 max-w-3xl text-sm leading-6 text-on-surface-variant">
-                  Sidebar and dashboard are split into dedicated components so the layout stays maintainable while the visual language remains consistent with the rest of the project.
-                </p>
-              </div>
             </section>
           </div>
         </main>

@@ -40,14 +40,14 @@ export default function AdminStatCard({
 
       <div className="relative flex h-full flex-col justify-between gap-4">
         <div className="flex items-center justify-between gap-3">
-          <div className={`flex h-11 w-11 items-center justify-center rounded-xl text-[20px] ${badgeClasses}`}>
+          <div className={`flex h-9 w-9 items-center justify-center rounded-sm text-[20px] ${badgeClasses}`}>
             <span className="material-symbols-outlined">{icon}</span>
           </div>
           <span className={`text-[10px] font-semibold uppercase tracking-[0.28em] ${titleClasses}`}>{title}</span>
         </div>
 
         <div className="space-y-1">
-          <p className={`text-3xl font-semibold tracking-[-0.04em] ${highlighted ? 'text-white' : 'text-on-surface'}`}>
+          <p className={`text-xl font-semibold tracking-[-0.04em] ${highlighted ? 'text-white' : 'text-on-surface'}`}>
             {value}
           </p>
           <p className={`text-sm ${subtitleClasses}`}>{subtitle}</p>
