@@ -409,8 +409,8 @@ export default function AdminLessonBuilder() {
                         placeholder="e.g. 01"
                         inputMode="numeric"
                       />
-                  </section>
-                )}
+                    </section>
+                  )}
 
                   {canContinueToTitle && (
                     <section className="space-y-3">
@@ -512,7 +512,7 @@ export default function AdminLessonBuilder() {
                   <button
                     type="submit"
                     disabled={!canSave || isSubmitting}
-                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(38,65,145,0.18)] transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex items-center gap-1 rounded-xl bg-primary px-2 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(38,65,145,0.18)] transition-all disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isSubmitting ? 'Saving lesson...' : 'Finish lesson'}
                     <span className="material-symbols-outlined text-[18px]">arrow_forward</span>

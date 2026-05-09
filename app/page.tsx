@@ -49,62 +49,62 @@ export default function Landing() {
           <h1 className="text-xl font-bold text-on-surface mb-4 leading-tight">
             Learn Nigerian Languages the Smart Way.
           </h1>
-        <p className="text-body-md text-on-surface-variant mb-8 max-w-[320px]">
-          Connect with your roots. Master Hausa, Igbo, and Yoruba through bite-sized, playful lessons.
-        </p>
-        
-        <div className="w-full flex flex-col gap-2">
-          <Link 
-            href="/register"
-            className="tactile-button-primary w-full py-3 uppercase tracking-wide text-sm text-center"
-          >
-            Get Started
-          </Link>
-          <Link 
-            href="/login"
-            className="tactile-button-secondary w-full py-3 uppercase tracking-wide text-sm text-center"
-          >
-            I already have an account
-          </Link>
-        </div>
-      </section>
+          <p className="text-body-md text-on-surface-variant mb-8 max-w-[320px]">
+            Connect with your roots. Master Hausa, Igbo, and Yoruba through bite-sized, playful lessons.
+          </p>
 
-      <section className="mb-3 w-full">
-        <h2 className="text-sm font-bold text-on-surface mb-5 text-center">I want to learn...</h2>
-        <div className="grid grid-cols-1 gap-2">
-          {[
-            { id: 'hausa', name: 'Hausa', sub: 'Kano, Sokoto & more', color: 'bg-orange-100', icon: 'location_city', iconColor: 'text-orange-600' },
-            { id: 'igbo', name: 'Igbo', sub: 'Enugu, Owerri & more', color: 'bg-blue-100', icon: 'landscape', iconColor: 'text-blue-600' },
-            { id: 'yoruba', name: 'Yoruba', sub: 'Lagos, Ibadan & more', color: 'bg-red-100', icon: 'temple_buddhist', iconColor: 'text-red-600' },
-          ].map((lang) => (
-            <Link 
-              key={lang.id}
+          <div className="w-full flex flex-col gap-2">
+            <Link
               href="/login"
-              className="tactile-card p-5 flex items-center gap-6 cursor-pointer hover:border-primary group"
+              className="tactile-button-primary w-full py-3 uppercase tracking-wide text-sm text-center"
             >
-              <div className={`w-10 h-10 ${lang.color} rounded-xl flex items-center justify-center ${lang.iconColor}`}>
-                <span className="material-symbols-outlined text-[40px]">{lang.icon}</span>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm font-bold text-on-surface">{lang.name}</h3>
-                <p className="text-outline text-sm">{lang.sub}</p>
-              </div>
-              <span className="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">
-                chevron_right
-              </span>
+              Get Started
             </Link>
-          ))}
-        </div>
-      </section>
+            <Link
+              href="/login"
+              className="tactile-button-secondary w-full py-3 uppercase tracking-wide text-sm text-center"
+            >
+              I already have an account
+            </Link>
+          </div>
+        </section>
 
-      <section className="bg-surface-container-low rounded-xl p-4 mb-4 text-center border-1 border-outline-variant w-full">
-        <span className="material-symbols-outlined text-primary text-[48px] mb-4">diversity_3</span>
-        <h2 className="text-sm font-bold text-on-surface mb-2">More than just words</h2>
-        <p className="text-on-surface-variant text-sm">
-          Dive into the history, music, and traditions that make these languages unique.
-        </p>
-      </section>
+        <section className="mb-3 w-full">
+          <h2 className="text-sm font-bold text-on-surface mb-5 text-center">I want to learn...</h2>
+          <div className="grid grid-cols-1 gap-2">
+            {[
+              { id: 'hausa', name: 'Hausa', sub: 'Kano, Sokoto & more', color: 'bg-orange-100', icon: 'location_city', iconColor: 'text-orange-600' },
+              { id: 'igbo', name: 'Igbo', sub: 'Enugu, Owerri & more', color: 'bg-blue-100', icon: 'landscape', iconColor: 'text-blue-600' },
+              { id: 'yoruba', name: 'Yoruba', sub: 'Lagos, Ibadan & more', color: 'bg-red-100', icon: 'temple_buddhist', iconColor: 'text-red-600' },
+            ].map((lang) => (
+              <Link
+                key={lang.id}
+                href="/login"
+                className="tactile-card p-5 flex items-center gap-6 cursor-pointer hover:border-primary group"
+              >
+                <div className={`w-10 h-10 ${lang.color} rounded-xl flex items-center justify-center ${lang.iconColor}`}>
+                  <span className="material-symbols-outlined text-[40px]">{lang.icon}</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-bold text-on-surface">{lang.name}</h3>
+                  <p className="text-outline text-sm">{lang.sub}</p>
+                </div>
+                <span className="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">
+                  chevron_right
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-surface-container-low rounded-xl p-4 mb-4 text-center border-1 border-outline-variant w-full">
+          <span className="material-symbols-outlined text-primary text-[48px] mb-4">diversity_3</span>
+          <h2 className="text-sm font-bold text-on-surface mb-2">More than just words</h2>
+          <p className="text-on-surface-variant text-sm">
+            Dive into the history, music, and traditions that make these languages unique.
+          </p>
+        </section>
+      </div>
     </div>
-  </div>
   );
 }

@@ -14,14 +14,14 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
     console.log("🌱 Seeding database...");
 
-    await prisma.progress.deleteMany({});
-    await prisma.quiz.deleteMany({});
-    await prisma.lesson.deleteMany({});
-    await prisma.language.deleteMany({});
-    await prisma.level.deleteMany({});
-    await prisma.user.deleteMany({
-        where: { email: "test@example.com" },
-    });
+    // await prisma.progress.deleteMany({});
+    // await prisma.quiz.deleteMany({});
+    // await prisma.lesson.deleteMany({});
+    // await prisma.language.deleteMany({});
+    // await prisma.level.deleteMany({});
+    // await prisma.user.deleteMany({
+    //     where: { email: "test@example.com" },
+    // });
 
     console.log("Cleared old data.");
 
