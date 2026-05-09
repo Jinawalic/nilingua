@@ -15,29 +15,45 @@ export const dynamic = 'force-dynamic';
 export default function AdminLoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [toastVisible, setToastVisible] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (loading) {
-      return;
-    }
+    if (loading) return;
 
     setLoading(true);
+    setError('');
 
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+    try {
+      const response = await fetch('/api/admin/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    setToastVisible(true);
+      const data = await response.json();
 
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      setToastVisible(true);
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        router.push('/admin');
+      }, 1000);
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred');
+      setLoading(false);
     }
-
-    timeoutRef.current = setTimeout(() => {
-      router.push('/admin');
-    }, 1400);
   };
 
   useEffect(() => {
@@ -81,6 +97,8 @@ export default function AdminLoginPage() {
                   <input
                     type="email"
                     placeholder="Enter your admin email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="h-14 w-full rounded-xl border border-outline-variant bg-white pl-12 pr-4 font-medium text-on-surface outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/10"
                   />
                 </div>
@@ -100,16 +118,21 @@ export default function AdminLoginPage() {
                   <input
                     type="password"
                     placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="h-14 w-full rounded-xl border border-outline-variant bg-white pl-12 pr-4 font-medium text-on-surface outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/10"
                   />
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-primary text-lg font-semibold text-white transition-all disabled:cursor-not-allowed disabled:opacity-70"
-              >
+                {error && (
+                  <p className="text-sm font-medium text-red-600 text-center">{error}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-primary text-lg font-semibold text-white transition-all disabled:cursor-not-allowed disabled:opacity-70"
+                >
                 {loading ? (
                   <>
                     <span className="h-5 w-5 rounded-full border-2 border-white border-t-transparent animate-spin" />

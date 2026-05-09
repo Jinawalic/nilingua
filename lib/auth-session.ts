@@ -53,7 +53,7 @@ async function getSigningKey() {
 
 async function signPayload(payload: Uint8Array) {
   const key = await getSigningKey();
-  const signature = await crypto.subtle.sign("HMAC", key, payload);
+  const signature = await crypto.subtle.sign("HMAC", key, payload as any);
   return bytesToBase64Url(new Uint8Array(signature));
 }
 
@@ -86,8 +86,8 @@ export async function verifySessionToken(token: string | null | undefined) {
     const isValid = await crypto.subtle.verify(
       "HMAC",
       key,
-      base64UrlToBytes(signaturePart),
-      payloadBytes
+      base64UrlToBytes(signaturePart) as any,
+      payloadBytes as any
     );
 
     if (!isValid) {

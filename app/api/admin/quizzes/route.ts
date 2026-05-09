@@ -378,7 +378,7 @@ export async function DELETE(req: Request) {
     const quizIds = Array.isArray(body.quizIds)
       ? body.quizIds
           .map((value: unknown) => Number(value))
-          .filter((value) => Number.isInteger(value) && value > 0)
+          .filter((value: number) => Number.isInteger(value) && value > 0)
       : [];
 
     if (quizIds.length === 0) {
