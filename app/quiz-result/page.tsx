@@ -6,32 +6,18 @@
 "use client";
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
 
-type SearchParams = {
-  [key: string]: string | string[] | undefined;
-};
-
-export default function QuizResultPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+function QuizResultContent() {
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
+  const [totalQuestions, setTotalQuestions] = useState(0);
 
-  const language =
-    typeof searchParams.language === 'string' ? searchParams.language.toLowerCase() : 'igbo';
-  const level =
-    typeof searchParams.level === 'string' ? searchParams.level.toLowerCase() : 'basic';
-  const score = parseInt(
-    typeof searchParams.score === 'string' ? searchParams.score : '0',
-    10
-  );
-  const total = parseInt(
-    typeof searchParams.total === 'string' ? searchParams.total : '3',
-    10
-  );
+  const language = searchParams.get('language')?.toLowerCase() || 'igbo';
+  const level = searchParams.get('level')?.toLowerCase() || 'basic';
+  const score = parseInt(searchParams.get('score') || '0', 10);
 
   const displayLanguage = language.charAt(0).toUpperCase() + language.slice(1);
   const displayLevel = level.charAt(0).toUpperCase() + level.slice(1);
@@ -42,12 +28,38 @@ export default function QuizResultPage({
         'home';
 
   const isHomeNext = nextLevel === 'home';
-  const scorePercentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
+    async function loadQuizStats() {
+      try {
+        const response = await fetch(`/api/quiz?language=${encodeURIComponent(language)}&level=${encodeURIComponent(level)}`);
+        if (response.ok) {
+          const quizData = await response.json();
+          const quizzes = Array.isArray(quizData) ? quizData : [];
+          
+          let count = 0;
+          quizzes.forEach((q: any) => {
+            if (q.questions && Array.isArray(q.questions)) {
+              count += q.questions.length;
+            } else if (q.question) {
+              count += 1;
+            }
+          });
+          
+          setTotalQuestions(count > 0 ? count : 3); // Fallback to 3 if no questions found
+        }
+      } catch (error) {
+        console.error('Failed to load quiz stats:', error);
+        setTotalQuestions(3);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadQuizStats();
+  }, [language, level]);
+
+  const scorePercentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 
   if (loading) {
     return (
@@ -105,7 +117,7 @@ export default function QuizResultPage({
                 <p className="text-xs text-blue-700 font-semibold uppercase tracking-wider mt-2">Score</p>
               </div>
               <div className="rounded-xl bg-emerald-100 p-4 text-center">
-                <p className="text-xl font-bold text-emerald-600">{score}/{total}</p>
+                <p className="text-xl font-bold text-emerald-600">{score}/{totalQuestions}</p>
                 <p className="text-xs text-emerald-700 font-semibold uppercase tracking-wider mt-2">Correct</p>
               </div>
             </div>
@@ -145,5 +157,17 @@ export default function QuizResultPage({
         </div>
       </main>
     </div>
+  );
+}
+
+export default function QuizResultPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col min-h-screen bg-surface items-center justify-center">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <QuizResultContent />
+    </Suspense>
   );
 }

@@ -1,9 +1,9 @@
 "use client";
 
-import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import AdminSidebar from '@/components/admin/AdminSidebar';
-import { createQuizId, getStoredQuizzes, saveStoredQuiz, type QuizQuestionDraft } from '@/lib/admin-quizzes';
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+
+import AdminSidebar from "@/components/admin/AdminSidebar";
 
 type LanguageOption = {
   id: string;
@@ -17,20 +17,39 @@ type LevelOption = {
   description: string;
 };
 
-const languageOptions: LanguageOption[] = [
-  { id: 'igbo', label: 'Igbo', description: 'Practical quiz questions for everyday language use.' },
-  { id: 'yoruba', label: 'Yoruba', description: 'Assessment prompts for core vocabulary and phrases.' },
-  { id: 'hausa', label: 'Hausa', description: 'Simple checks for foundational comprehension.' },
-];
+type QuizQuestionDraft = {
+  question: string;
+  options: {
+    a: string;
+    b: string;
+    c: string;
+    d: string;
+  };
+  correctOption: "A" | "B" | "C" | "D";
+};
 
-const levelOptions: LevelOption[] = [
-  { id: 'basic', label: 'Basic', description: 'Short, direct quiz questions for beginners.' },
-  { id: 'intermediate', label: 'Intermediate', description: 'Mixed recall and comprehension questions.' },
-  { id: 'advanced', label: 'Advanced', description: 'Deeper context and translation-based questions.' },
-];
+type AdminCatalogResponse = {
+  languages: LanguageOption[];
+  levels: LevelOption[];
+};
+
+type AdminQuizRecord = {
+  dbId: number;
+  id: string;
+  language: string;
+  level: string;
+  quizNumber: string;
+  questions: QuizQuestionDraft[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+type AdminQuizzesResponse = {
+  quizzes: AdminQuizRecord[];
+};
 
 function fieldClassName() {
-  return 'w-full rounded-xl border border-outline-variant bg-white px-4 py-3 text-sm text-on-surface outline-none transition-all placeholder:text-on-surface-variant focus:border-primary focus:ring-4 focus:ring-primary/10';
+  return "w-full rounded-xl border border-outline-variant bg-white px-4 py-3 text-sm text-on-surface outline-none transition-all placeholder:text-on-surface-variant focus:border-primary focus:ring-4 focus:ring-primary/10";
 }
 
 function sectionBadge(step: string) {
@@ -42,34 +61,51 @@ function sectionBadge(step: string) {
 }
 
 export default function AdminQuizzesPage() {
-  const [language, setLanguage] = useState('');
-  const [level, setLevel] = useState('');
-  const [question, setQuestion] = useState('');
-  const [optionA, setOptionA] = useState('');
-  const [optionB, setOptionB] = useState('');
-  const [optionC, setOptionC] = useState('');
-  const [optionD, setOptionD] = useState('');
-  const [correctOption, setCorrectOption] = useState<'A' | 'B' | 'C' | 'D' | ''>('');
+  const [languageOptions, setLanguageOptions] = useState<LanguageOption[]>([]);
+  const [levelOptions, setLevelOptions] = useState<LevelOption[]>([]);
+  const [quizzes, setQuizzes] = useState<AdminQuizRecord[]>([]);
+  const [language, setLanguage] = useState("");
+  const [level, setLevel] = useState("");
+  const [question, setQuestion] = useState("");
+  const [optionA, setOptionA] = useState("");
+  const [optionB, setOptionB] = useState("");
+  const [optionC, setOptionC] = useState("");
+  const [optionD, setOptionD] = useState("");
+  const [correctOption, setCorrectOption] = useState<"A" | "B" | "C" | "D" | "">("");
   const [quizDrafts, setQuizDrafts] = useState<QuizQuestionDraft[]>([]);
-  const [savedMessage, setSavedMessage] = useState('');
+  const [savedMessage, setSavedMessage] = useState("");
   const [contentUnlocked, setContentUnlocked] = useState(false);
   const [isUnlockingContent, setIsUnlockingContent] = useState(false);
   const [isSavingQuestion, setIsSavingQuestion] = useState(false);
   const [quizFinished, setQuizFinished] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [catalogError, setCatalogError] = useState("");
 
   const unlockTimerRef = useRef<number | null>(null);
   const mainScrollRef = useRef<HTMLElement | null>(null);
 
   const selectedLanguage = useMemo(
     () => languageOptions.find((option) => option.id === language),
-    [language],
+    [language, languageOptions],
   );
 
-  const selectedLevel = useMemo(() => levelOptions.find((option) => option.id === level), [level]);
+  const selectedLevel = useMemo(() => levelOptions.find((option) => option.id === level), [level, levelOptions]);
+
+  const quizzesForSelection = useMemo(
+    () => quizzes.filter((quiz) => quiz.language === language && quiz.level === level),
+    [language, level, quizzes],
+  );
 
   const canContinueToLevel = Boolean(language);
   const canContinueToQuestions = Boolean(language && level);
-  const hasPendingQuestion = Boolean(question.trim() && optionA.trim() && optionB.trim() && optionC.trim() && optionD.trim() && correctOption);
+  const hasPendingQuestion = Boolean(
+    question.trim() &&
+      optionA.trim() &&
+      optionB.trim() &&
+      optionC.trim() &&
+      optionD.trim() &&
+      correctOption,
+  );
   const canContinue = quizFinished ? false : contentUnlocked ? hasPendingQuestion : canContinueToQuestions;
   const canFinish = Boolean(canContinueToQuestions && (quizDrafts.length > 0 || hasPendingQuestion) && !quizFinished);
 
@@ -80,22 +116,73 @@ export default function AdminQuizzesPage() {
     }
   }
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadData() {
+      setIsLoadingData(true);
+      setCatalogError("");
+
+      try {
+        const [catalogResponse, quizzesResponse] = await Promise.all([
+          fetch("/api/admin/catalog", { cache: "no-store" }),
+          fetch("/api/admin/quizzes", { cache: "no-store" }),
+        ]);
+
+        if (!catalogResponse.ok || !quizzesResponse.ok) {
+          throw new Error("Unable to load quiz categories.");
+        }
+
+        const catalog = (await catalogResponse.json()) as AdminCatalogResponse;
+        const quizData = (await quizzesResponse.json()) as AdminQuizzesResponse;
+
+        if (cancelled) {
+          return;
+        }
+
+        setLanguageOptions(Array.isArray(catalog.languages) ? catalog.languages : []);
+        setLevelOptions(Array.isArray(catalog.levels) ? catalog.levels : []);
+        setQuizzes(Array.isArray(quizData.quizzes) ? quizData.quizzes : []);
+      } catch {
+        if (!cancelled) {
+          setCatalogError("Unable to load languages, levels, and quizzes from the database.");
+          setLanguageOptions([]);
+          setLevelOptions([]);
+          setQuizzes([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingData(false);
+        }
+      }
+    }
+
+    loadData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   function resetQuestionFields() {
-    setQuestion('');
-    setOptionA('');
-    setOptionB('');
-    setOptionC('');
-    setOptionD('');
-    setCorrectOption('');
+    setQuestion("");
+    setOptionA("");
+    setOptionB("");
+    setOptionC("");
+    setOptionD("");
+    setCorrectOption("");
   }
 
   function resetWorkspace() {
     clearUnlockTimer();
-    setLanguage('');
-    setLevel('');
-    resetQuestionFields();
+    setQuestion("");
+    setOptionA("");
+    setOptionB("");
+    setOptionC("");
+    setOptionD("");
+    setCorrectOption("");
     setQuizDrafts([]);
-    setSavedMessage('');
+    setSavedMessage("");
     setContentUnlocked(false);
     setIsUnlockingContent(false);
     setIsSavingQuestion(false);
@@ -105,6 +192,7 @@ export default function AdminQuizzesPage() {
   function handleLanguageChange(value: string) {
     resetWorkspace();
     setLanguage(value);
+    setLevel("");
   }
 
   function handleLevelChange(value: string) {
@@ -112,7 +200,7 @@ export default function AdminQuizzesPage() {
     setLevel(value);
     resetQuestionFields();
     setQuizDrafts([]);
-    setSavedMessage('');
+    setSavedMessage("");
     setContentUnlocked(false);
     setIsUnlockingContent(false);
     setIsSavingQuestion(false);
@@ -129,7 +217,7 @@ export default function AdminQuizzesPage() {
         return;
       }
 
-      setSavedMessage('');
+      setSavedMessage("");
       setIsUnlockingContent(true);
       clearUnlockTimer();
 
@@ -147,7 +235,7 @@ export default function AdminQuizzesPage() {
     }
 
     setIsSavingQuestion(true);
-    setSavedMessage('');
+    setSavedMessage("");
 
     window.setTimeout(() => {
       setQuizDrafts((currentDrafts) => [
@@ -160,7 +248,7 @@ export default function AdminQuizzesPage() {
             c: optionC.trim(),
             d: optionD.trim(),
           },
-          correctOption: correctOption as 'A' | 'B' | 'C' | 'D',
+          correctOption: correctOption as "A" | "B" | "C" | "D",
         },
       ]);
       resetQuestionFields();
@@ -168,10 +256,10 @@ export default function AdminQuizzesPage() {
     }, 700);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!canFinish) {
+    if (!canFinish || isLoadingData) {
       return;
     }
 
@@ -186,35 +274,57 @@ export default function AdminQuizzesPage() {
           c: optionC.trim(),
           d: optionD.trim(),
         },
-        correctOption: correctOption as 'A' | 'B' | 'C' | 'D',
+        correctOption: correctOption as "A" | "B" | "C" | "D",
       });
     }
 
-    const existingQuizzes = getStoredQuizzes();
-    const nextQuizNumber = String(
-      existingQuizzes.filter((quiz) => quiz.language === language && quiz.level === level).length + 1,
-    ).padStart(2, '0');
-    const quizId = createQuizId(language, level, nextQuizNumber);
+    const nextQuizNumber = String(quizzesForSelection.length + 1).padStart(2, "0");
 
-    saveStoredQuiz({
-      id: quizId,
-      language,
-      level,
-      quizNumber: nextQuizNumber,
-      questions: finalDrafts,
-      updatedAt: new Date().toISOString(),
-    });
+    setIsSavingQuestion(true);
+    setSavedMessage("");
 
-    setSavedMessage(
-      `You have finished creating quiz ${nextQuizNumber} for ${selectedLanguage?.label || 'the selected language'} (${selectedLevel?.label || 'the selected level'}). ${finalDrafts.length} question${finalDrafts.length === 1 ? '' : 's'} are ready to save to the database.`,
-    );
-    setQuizFinished(true);
-    setContentUnlocked(false);
-    setIsSavingQuestion(false);
-    setIsUnlockingContent(false);
-    resetQuestionFields();
-    clearUnlockTimer();
-    mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    try {
+      const response = await fetch("/api/admin/quizzes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          language,
+          level,
+          quizNumber: nextQuizNumber,
+          questions: finalDrafts,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.message || "Unable to create quiz.");
+      }
+
+      if (result?.quiz) {
+        const nextQuiz = result.quiz as AdminQuizRecord;
+        setQuizzes((currentQuizzes) => [
+          ...currentQuizzes.filter((quiz) => quiz.dbId !== nextQuiz.dbId),
+          nextQuiz,
+        ]);
+      }
+
+      setSavedMessage(
+        `You have finished creating quiz ${result?.quiz?.quizNumber || nextQuizNumber} for ${selectedLanguage?.label || "the selected language"} (${selectedLevel?.label || "the selected level"}). ${finalDrafts.length} question${finalDrafts.length === 1 ? "" : "s"} were saved to the database.`,
+      );
+      setQuizFinished(true);
+      setContentUnlocked(false);
+      setIsSavingQuestion(false);
+      setIsUnlockingContent(false);
+      resetQuestionFields();
+      clearUnlockTimer();
+      mainScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      setSavedMessage(error instanceof Error ? error.message : "Unable to create quiz.");
+      setIsSavingQuestion(false);
+    }
   }
 
   useEffect(() => {
@@ -231,9 +341,8 @@ export default function AdminQuizzesPage() {
         <main ref={mainScrollRef} className="min-w-0 flex-1 overflow-y-auto bg-[linear-gradient(180deg,#f7f8fd_0%,#eef2ff_100%)] px-6 py-6">
           <div className="mx-auto flex min-h-full w-full max-w-[1180px] flex-col gap-6">
             <header className="flex items-start justify-between gap-4">
-              <div><h1 className="text-xl font-semibold tracking-[-0.05em] text-on-surface">
-                  Create a new quiz
-                </h1>
+              <div>
+                <h1 className="text-xl font-semibold tracking-[-0.05em] text-on-surface">Create a new quiz</h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-on-surface-variant">
                   Build quiz content in a clear, step-by-step flow for Nilingua admins.
                 </p>
@@ -253,6 +362,12 @@ export default function AdminQuizzesPage() {
               </div>
             )}
 
+            {catalogError && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+                {catalogError}
+              </div>
+            )}
+
             <section className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
               <form onSubmit={handleSubmit} className="rounded-xl border border-outline-variant bg-white p-6 shadow-[0_12px_30px_rgba(38,65,145,0.06)]">
                 <div className="flex items-center justify-between gap-3">
@@ -263,14 +378,14 @@ export default function AdminQuizzesPage() {
                     </p>
                   </div>
                   <div className="rounded-xl bg-surface px-4 py-2 text-sm font-medium text-on-surface-variant">
-                    {selectedLanguage ? `${selectedLanguage.label} / ${selectedLevel?.label || 'Choose level'}` : 'Start here'}
+                    {selectedLanguage ? `${selectedLanguage.label} / ${selectedLevel?.label || "Choose level"}` : "Start here"}
                   </div>
                 </div>
 
                 <div className="mt-6 space-y-5">
                   <section className="space-y-3">
                     <div className="flex items-center gap-3">
-                      {sectionBadge('1')}
+                      {sectionBadge("1")}
                       <div>
                         <h2 className="font-semibold text-on-surface">Language</h2>
                         <p className="text-sm text-on-surface-variant">Choose the language for this quiz.</p>
@@ -280,9 +395,10 @@ export default function AdminQuizzesPage() {
                     <select
                       className={fieldClassName()}
                       value={language}
+                      disabled={isLoadingData}
                       onChange={(event) => handleLanguageChange(event.target.value)}
                     >
-                      <option value="">Select language</option>
+                      <option value="">{isLoadingData ? "Loading languages..." : "Select language"}</option>
                       {languageOptions.map((option) => (
                         <option key={option.id} value={option.id}>
                           {option.label}
@@ -294,7 +410,7 @@ export default function AdminQuizzesPage() {
                   {canContinueToLevel && (
                     <section className="space-y-3">
                       <div className="flex items-center gap-3">
-                        {sectionBadge('2')}
+                        {sectionBadge("2")}
                         <div>
                           <h2 className="font-semibold text-on-surface">Level</h2>
                           <p className="text-sm text-on-surface-variant">Select the quiz difficulty level.</p>
@@ -304,9 +420,10 @@ export default function AdminQuizzesPage() {
                       <select
                         className={fieldClassName()}
                         value={level}
+                        disabled={isLoadingData}
                         onChange={(event) => handleLevelChange(event.target.value)}
                       >
-                        <option value="">Select level</option>
+                        <option value="">{isLoadingData ? "Loading levels..." : "Select level"}</option>
                         {levelOptions.map((option) => (
                           <option key={option.id} value={option.id}>
                             {option.label}
@@ -322,7 +439,7 @@ export default function AdminQuizzesPage() {
                         <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
                           <div className="space-y-3 xl:col-span-2">
                             <div className="flex items-center gap-3">
-                              {sectionBadge('3')}
+                              {sectionBadge("3")}
                               <div>
                                 <h2 className="font-semibold text-on-surface">Question prompt</h2>
                                 <p className="text-sm text-on-surface-variant">Write the quiz question here.</p>
@@ -334,7 +451,7 @@ export default function AdminQuizzesPage() {
                               value={question}
                               onChange={(event) => {
                                 setQuestion(event.target.value);
-                                setSavedMessage('');
+                                setSavedMessage("");
                               }}
                               placeholder="Write the question prompt for students..."
                             />
@@ -356,7 +473,7 @@ export default function AdminQuizzesPage() {
                               value={optionA}
                               onChange={(event) => {
                                 setOptionA(event.target.value);
-                                setSavedMessage('');
+                                setSavedMessage("");
                               }}
                               placeholder="Enter option A"
                             />
@@ -378,7 +495,7 @@ export default function AdminQuizzesPage() {
                               value={optionB}
                               onChange={(event) => {
                                 setOptionB(event.target.value);
-                                setSavedMessage('');
+                                setSavedMessage("");
                               }}
                               placeholder="Enter option B"
                             />
@@ -400,7 +517,7 @@ export default function AdminQuizzesPage() {
                               value={optionC}
                               onChange={(event) => {
                                 setOptionC(event.target.value);
-                                setSavedMessage('');
+                                setSavedMessage("");
                               }}
                               placeholder="Enter option C"
                             />
@@ -422,7 +539,7 @@ export default function AdminQuizzesPage() {
                               value={optionD}
                               onChange={(event) => {
                                 setOptionD(event.target.value);
-                                setSavedMessage('');
+                                setSavedMessage("");
                               }}
                               placeholder="Enter option D"
                             />
@@ -430,7 +547,7 @@ export default function AdminQuizzesPage() {
 
                           <div className="space-y-3 xl:col-span-2">
                             <div className="flex items-center gap-3">
-                              {sectionBadge('4')}
+                              {sectionBadge("4")}
                               <div>
                                 <h2 className="font-semibold text-on-surface">Correct answer</h2>
                                 <p className="text-sm text-on-surface-variant">Mark the correct option for this question.</p>
@@ -441,8 +558,8 @@ export default function AdminQuizzesPage() {
                               className={fieldClassName()}
                               value={correctOption}
                               onChange={(event) => {
-                                setCorrectOption(event.target.value as 'A' | 'B' | 'C' | 'D');
-                                setSavedMessage('');
+                                setCorrectOption(event.target.value as "A" | "B" | "C" | "D");
+                                setSavedMessage("");
                               }}
                             >
                               <option value="">Select correct option</option>
@@ -465,10 +582,10 @@ export default function AdminQuizzesPage() {
                 <div className="mt-6 flex items-center justify-between gap-4 border-t border-outline-variant/70 pt-5">
                   <p className="text-sm text-on-surface-variant">
                     {quizFinished
-                      ? 'Quiz creation is complete. The success message is ready at the top of the page.'
+                      ? "Quiz creation is complete. The success message is ready at the top of the page."
                       : contentUnlocked
-                        ? 'Fill each question, use Continue to save drafts, then finish the quiz when you are done.'
-                        : 'Complete the quiz details in order, then Continue will unlock the question builder.'}
+                        ? "Fill each question, use Continue to save drafts, then finish the quiz when you are done."
+                        : "Complete the quiz details in order, then Continue will unlock the question builder."}
                   </p>
 
                   <button
@@ -477,7 +594,7 @@ export default function AdminQuizzesPage() {
                     disabled={!canContinue}
                     className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(38,65,145,0.18)] transition-all disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {isUnlockingContent || isSavingQuestion ? 'Continuing...' : 'Continue'}
+                    {isUnlockingContent || isSavingQuestion ? "Continuing..." : "Continue"}
                     {isUnlockingContent || isSavingQuestion ? (
                       <span
                         aria-hidden="true"
@@ -490,7 +607,7 @@ export default function AdminQuizzesPage() {
 
                   <button
                     type="submit"
-                    disabled={!canFinish}
+                    disabled={!canFinish || isLoadingData}
                     className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(38,65,145,0.18)] transition-all disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Finish quiz
@@ -523,15 +640,23 @@ export default function AdminQuizzesPage() {
                   <div className="mt-5 space-y-3">
                     <div className="rounded-xl border border-outline-variant/70 bg-surface px-4 py-3">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/65">Language</p>
-                      <p className="mt-1 font-medium text-on-surface">{selectedLanguage?.label || 'Not selected'}</p>
+                      <p className="mt-1 font-medium text-on-surface">{selectedLanguage?.label || "Not selected"}</p>
                     </div>
                     <div className="rounded-xl border border-outline-variant/70 bg-surface px-4 py-3">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/65">Level</p>
-                      <p className="mt-1 font-medium text-on-surface">{selectedLevel?.label || 'Not selected'}</p>
+                      <p className="mt-1 font-medium text-on-surface">{selectedLevel?.label || "Not selected"}</p>
                     </div>
                     <div className="rounded-xl border border-outline-variant/70 bg-surface px-4 py-3">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/65">Drafts</p>
-                      <p className="mt-1 font-medium text-on-surface">{quizDrafts.length} saved question{quizDrafts.length === 1 ? '' : 's'}</p>
+                      <p className="mt-1 font-medium text-on-surface">{quizDrafts.length} saved question{quizDrafts.length === 1 ? "" : "s"}</p>
+                    </div>
+                    <div className="rounded-xl border border-outline-variant/70 bg-surface px-4 py-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary/65">Saved</p>
+                      <p className="mt-1 font-medium text-on-surface">
+                        {quizzesForSelection.length > 0
+                          ? `${quizzesForSelection.length} quiz${quizzesForSelection.length === 1 ? "" : "zes"} in this selection`
+                          : "No quizzes in this selection"}
+                      </p>
                     </div>
                   </div>
                 </article>
@@ -540,8 +665,8 @@ export default function AdminQuizzesPage() {
                   <p className="text-[22px] font-semibold tracking-[-0.03em] text-on-surface">Draft questions</p>
                   <p className="mt-2 text-sm text-on-surface-variant">
                     {quizDrafts.length > 0
-                      ? `${quizDrafts.length} question${quizDrafts.length === 1 ? '' : 's'} captured so far.`
-                      : 'No saved questions yet.'}
+                      ? `${quizDrafts.length} question${quizDrafts.length === 1 ? "" : "s"} captured so far.`
+                      : "No saved questions yet."}
                   </p>
 
                   <div className="mt-4 space-y-3">

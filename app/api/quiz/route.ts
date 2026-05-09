@@ -1,7 +1,22 @@
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
-    const quiz = await prisma.quiz.findMany();
+export async function GET(req: Request) {
+    const url = new URL(req.url);
+    const language = url.searchParams.get("language");
+    const level = url.searchParams.get("level");
+
+    const where: any = {};
+    if (language) {
+        where.language = language;
+    }
+    if (level) {
+        where.level = level;
+    }
+
+    const quiz = await prisma.quiz.findMany({
+        where,
+        orderBy: [{ quizNumber: "asc" }, { id: "asc" }],
+    });
 
     return Response.json(quiz);
 }

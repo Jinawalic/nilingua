@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
-import { createLessonId, saveStoredLesson, type LessonEntryDraft } from '@/lib/admin-lessons';
+import type { LessonEntryDraft } from '@/lib/admin-lessons';
 
 type LanguageOption = {
   id: string;
@@ -17,17 +17,10 @@ type LevelOption = {
   description: string;
 };
 
-const languageOptions: LanguageOption[] = [
-  { id: 'igbo', label: 'Igbo', description: 'Core greetings, vocabulary, and expressions.' },
-  { id: 'yoruba', label: 'Yoruba', description: 'Practical language patterns for everyday use.' },
-  { id: 'hausa', label: 'Hausa', description: 'Foundational lessons for common communication.' },
-];
-
-const levelOptions: LevelOption[] = [
-  { id: 'basic', label: 'Basic', description: 'Introduction, simple words, and phrases.' },
-  { id: 'intermediate', label: 'Intermediate', description: 'Conversation, grammar, and sentence building.' },
-  { id: 'advanced', label: 'Advanced', description: 'Idioms, context, and fluent usage.' },
-];
+type AdminCatalogResponse = {
+  languages: LanguageOption[];
+  levels: LevelOption[];
+};
 
 function fieldClassName() {
   return 'w-full rounded-xl border border-outline-variant bg-white px-4 py-3 text-sm text-on-surface outline-none transition-all placeholder:text-on-surface-variant focus:border-primary focus:ring-4 focus:ring-primary/10';
@@ -42,6 +35,8 @@ function sectionBadge(step: string) {
 }
 
 export default function AdminLessonBuilder() {
+  const [languageOptions, setLanguageOptions] = useState<LanguageOption[]>([]);
+  const [levelOptions, setLevelOptions] = useState<LevelOption[]>([]);
   const [language, setLanguage] = useState('');
   const [level, setLevel] = useState('');
   const [lessonNumber, setLessonNumber] = useState('');
@@ -53,15 +48,18 @@ export default function AdminLessonBuilder() {
   const [contentUnlocked, setContentUnlocked] = useState(false);
   const [isUnlockingContent, setIsUnlockingContent] = useState(false);
   const [isSavingEntry, setIsSavingEntry] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingCatalog, setIsLoadingCatalog] = useState(true);
+  const [catalogError, setCatalogError] = useState('');
 
   const unlockTimerRef = useRef<number | null>(null);
 
   const selectedLanguage = useMemo(
     () => languageOptions.find((option) => option.id === language),
-    [language],
+    [language, languageOptions],
   );
 
-  const selectedLevel = useMemo(() => levelOptions.find((option) => option.id === level), [level]);
+  const selectedLevel = useMemo(() => levelOptions.find((option) => option.id === level), [level, levelOptions]);
 
   const canContinueToLevel = Boolean(language);
   const canContinueToNumber = Boolean(language && level);
@@ -71,6 +69,50 @@ export default function AdminLessonBuilder() {
   const canContinue = contentUnlocked ? hasPendingEntry : canContinueToContent;
   const canSave = Boolean((lessonEntries.length > 0 || hasPendingEntry) && canContinueToContent);
   const formattedLessonNumber = lessonNumber.trim().padStart(2, '0');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCatalog() {
+      setIsLoadingCatalog(true);
+      setCatalogError('');
+
+      try {
+        const response = await fetch('/api/admin/catalog', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          throw new Error('Unable to load lesson categories.');
+        }
+
+        const data = (await response.json()) as AdminCatalogResponse;
+
+        if (cancelled) {
+          return;
+        }
+
+        setLanguageOptions(Array.isArray(data.languages) ? data.languages : []);
+        setLevelOptions(Array.isArray(data.levels) ? data.levels : []);
+      } catch {
+        if (!cancelled) {
+          setCatalogError('Unable to load languages and levels from the database.');
+          setLanguageOptions([]);
+          setLevelOptions([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingCatalog(false);
+        }
+      }
+    }
+
+    loadCatalog();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function clearUnlockTimer() {
     if (unlockTimerRef.current) {
@@ -92,6 +134,7 @@ export default function AdminLessonBuilder() {
     setContentUnlocked(false);
     setIsUnlockingContent(false);
     setIsSavingEntry(false);
+    setIsSubmitting(false);
   }
 
   function handleLevelChange(value: string) {
@@ -106,6 +149,7 @@ export default function AdminLessonBuilder() {
     setContentUnlocked(false);
     setIsUnlockingContent(false);
     setIsSavingEntry(false);
+    setIsSubmitting(false);
   }
 
   function handleLessonNumberChange(value: string) {
@@ -118,6 +162,7 @@ export default function AdminLessonBuilder() {
     setContentUnlocked(false);
     setIsUnlockingContent(false);
     setIsSavingEntry(false);
+    setIsSubmitting(false);
   }
 
   function handleLessonTitleChange(value: string) {
@@ -130,10 +175,11 @@ export default function AdminLessonBuilder() {
     setContentUnlocked(false);
     setIsUnlockingContent(false);
     setIsSavingEntry(false);
+    setIsSubmitting(false);
   }
 
   function handleContinue() {
-    if (isUnlockingContent || isSavingEntry) {
+    if (isUnlockingContent || isSavingEntry || isSubmitting) {
       return;
     }
 
@@ -176,10 +222,10 @@ export default function AdminLessonBuilder() {
     }, 700);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!canSave) {
+    if (!canSave || isSubmitting) {
       return;
     }
 
@@ -192,21 +238,38 @@ export default function AdminLessonBuilder() {
       });
     }
 
-    const lessonId = createLessonId(language, level, lessonNumber);
+    setIsSubmitting(true);
+    setSavedMessage('');
 
-    saveStoredLesson({
-      id: lessonId,
-      language,
-      level,
-      lessonNumber: formattedLessonNumber,
-      lessonTitle: lessonTitle.trim(),
-      entries: finalEntries,
-      updatedAt: new Date().toISOString(),
-    });
+    try {
+      const response = await fetch('/api/admin/lessons', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          language,
+          level,
+          lessonNumber: formattedLessonNumber,
+          lessonTitle: lessonTitle.trim(),
+          entries: finalEntries,
+        }),
+      });
 
-    setSavedMessage(
-      `You have finished creating lesson ${formattedLessonNumber} for ${selectedLanguage?.label || 'the selected language'} (${selectedLevel?.label || 'the selected level'}). ${finalEntries.length} word pair${finalEntries.length === 1 ? '' : 's'} are ready to save to the database.`,
-    );
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.message || 'Unable to create lesson.');
+      }
+
+      setSavedMessage(
+        `Lesson ${formattedLessonNumber} for ${selectedLanguage?.label || 'the selected language'} (${selectedLevel?.label || 'the selected level'}) was saved successfully. ${finalEntries.length} word pair${finalEntries.length === 1 ? '' : 's'} were added to the database.`,
+      );
+    } catch (error) {
+      setSavedMessage(error instanceof Error ? error.message : 'Unable to create lesson.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   useEffect(() => {
@@ -246,6 +309,12 @@ export default function AdminLessonBuilder() {
               </div>
             )}
 
+            {catalogError && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+                {catalogError}
+              </div>
+            )}
+
             <section className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
               <form onSubmit={handleSubmit} className="rounded-xl border border-outline-variant bg-white p-6 shadow-[0_12px_30px_rgba(38,65,145,0.06)]">
                 <div className="flex items-center justify-between gap-3">
@@ -273,14 +342,21 @@ export default function AdminLessonBuilder() {
                     <select
                       className={fieldClassName()}
                       value={language}
+                      disabled={isLoadingCatalog}
                       onChange={(event) => handleLanguageChange(event.target.value)}
                     >
-                      <option value="">Select language</option>
-                      {languageOptions.map((option) => (
-                        <option key={option.id} value={option.id}>
-                          {option.label}
-                        </option>
-                      ))}
+                      {isLoadingCatalog ? (
+                        <option value="">Loading languages...</option>
+                      ) : (
+                        <>
+                          <option value="">Select language</option>
+                          {languageOptions.map((option) => (
+                            <option key={option.id} value={option.id}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </>
+                      )}
                     </select>
                   </section>
 
@@ -297,14 +373,21 @@ export default function AdminLessonBuilder() {
                       <select
                         className={fieldClassName()}
                         value={level}
+                        disabled={isLoadingCatalog}
                         onChange={(event) => handleLevelChange(event.target.value)}
                       >
-                        <option value="">Select level</option>
-                        {levelOptions.map((option) => (
-                          <option key={option.id} value={option.id}>
-                            {option.label}
-                          </option>
-                        ))}
+                        {isLoadingCatalog ? (
+                          <option value="">Loading levels...</option>
+                        ) : (
+                          <>
+                            <option value="">Select level</option>
+                            {levelOptions.map((option) => (
+                              <option key={option.id} value={option.id}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </>
+                        )}
                       </select>
                     </section>
                   )}
@@ -413,7 +496,7 @@ export default function AdminLessonBuilder() {
                   <button
                     type="button"
                     onClick={handleContinue}
-                    disabled={!canContinue || isUnlockingContent || isSavingEntry}
+                    disabled={!canContinue || isUnlockingContent || isSavingEntry || isSubmitting}
                     className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(38,65,145,0.18)] transition-all disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isUnlockingContent || isSavingEntry ? 'Continuing...' : 'Continue'}
@@ -428,10 +511,10 @@ export default function AdminLessonBuilder() {
                   </button>
                   <button
                     type="submit"
-                    disabled={!canSave}
+                    disabled={!canSave || isSubmitting}
                     className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(38,65,145,0.18)] transition-all disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    Finish lesson
+                    {isSubmitting ? 'Saving lesson...' : 'Finish lesson'}
                     <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </button>
                 </div>

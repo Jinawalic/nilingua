@@ -24,7 +24,7 @@ export function TopBar({ onBack, showBack, title = 'Nilingua', onLogin, streak, 
 
       <div className="flex items-center gap-4">
         {showBack && (
-          <button 
+          <button
             onClick={onBack}
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant active:translate-y-[2px] transition-all text-outline"
           >
@@ -33,18 +33,15 @@ export function TopBar({ onBack, showBack, title = 'Nilingua', onLogin, streak, 
         )}
         <h1 className="text-xl font-bold text-primary">{title}</h1>
       </div>
-      
+
       <div className="flex items-center gap-2">
         {streak !== undefined && (
-          <div className="flex items-center gap-1 bg-surface-variant px-3 py-1 rounded-full border border-outline-variant">
-            <span className="material-symbols-outlined text-orange-500 text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-              local_fire_department
-            </span>
-            <span className="font-bold text-sm">{streak}</span>
+          <div className="flex items-center gap-1">
+            <img src="/images/welcome-img.png" alt="" className='w-8 h-8 rounded-full' />
           </div>
         )}
         {onLogin && (
-          <Link 
+          <Link
             href="/login"
             className="text-outline font-lexend font-bold text-sm hover:bg-surface-variant px-3 py-1 rounded-lg transition-all"
           >
@@ -52,7 +49,7 @@ export function TopBar({ onBack, showBack, title = 'Nilingua', onLogin, streak, 
           </Link>
         )}
         {homeLink && (
-          <Link 
+          <Link
             href="/home"
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant active:translate-y-[2px] transition-all text-outline"
             aria-label="Home"
@@ -69,7 +66,7 @@ export function TopBar({ onBack, showBack, title = 'Nilingua', onLogin, streak, 
 
 export function BottomBar() {
   const pathname = usePathname();
-  
+
   const tabs = [
     { href: '/home', icon: 'home', label: 'Home' },
     { href: '/lessons', icon: 'school', label: 'Lessons' },
@@ -86,11 +83,10 @@ export function BottomBar() {
           <Link
             key={tab.href}
             href={tab.href}
-            className={`flex flex-col items-center justify-center px-6 py-2 rounded-xl transition-all duration-150 active:scale-95 border-b-4 ${
-              isActive 
-                ? 'text-primary bg-primary/5 border-primary' 
-                : 'text-outline border-transparent hover:text-primary'
-            }`}
+            className={`flex flex-col items-center justify-center px-6 py-2 rounded-xl transition-all duration-150 active:scale-95 border-b-4 ${isActive
+              ? 'text-primary bg-primary/5 border-primary'
+              : 'text-outline border-transparent hover:text-primary'
+              }`}
           >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}>
               {tab.icon}

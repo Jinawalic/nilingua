@@ -11,33 +11,37 @@ import { TopBar, BottomBar } from '@/components/Navigation';
 
 export const dynamic = 'force-dynamic';
 
+type LanguageItem = {
+  id: string;
+  label: string;
+  description: string;
+};
+
 export default function LessonsPage() {
   const [loading, setLoading] = useState(true);
-
-  const languages = [
-    {
-      slug: 'igbo',
-      name: 'Igbo',
-      description: 'Learn greetings, basics, and everyday expressions.',
-      flag: '🇳🇬',
-    },
-    {
-      slug: 'yoruba',
-      name: 'Yoruba',
-      description: 'Start with core vocabulary and useful phrases.',
-      flag: '🇳🇬',
-    },
-    {
-      slug: 'hausa',
-      name: 'Hausa',
-      description: 'Explore the fundamentals of one of Nigeria’s major languages.',
-      flag: '🇳🇬',
-    },
-  ];
+  const [languages, setLanguages] = useState<LanguageItem[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 700);
-    return () => clearTimeout(timer);
+    async function loadLanguages() {
+      try {
+        const response = await fetch('/api/admin/catalog');
+        const result = await response.json();
+
+        if (response.ok && Array.isArray(result.languages)) {
+          setLanguages(result.languages.map((language: any) => ({
+            id: language.id,
+            label: language.label,
+            description: language.description || '',
+          })));
+        }
+      } catch (error) {
+        console.error('Unable to load languages:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadLanguages();
   }, []);
 
   return (
@@ -61,13 +65,13 @@ export default function LessonsPage() {
             <div className="flex flex-col gap-3">
               {languages.map((language) => (
                 <Link
-                  key={language.slug}
-                  href={`/languages/${language.slug}`}
+                  key={language.id}
+                  href={`/languages/${language.id}`}
                   className="rounded-xl border border-outline-variant bg-white p-4 transition-shadow duration-200 hover:shadow-xl"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <h2 className="text-xl font-semibold text-on-surface">{language.name}</h2>
+                      <h2 className="text-xl font-semibold text-on-surface">{language.label}</h2>
                       <p className="text-sm text-on-surface-variant mt-1">{language.description}</p>
                     </div>
                     <span className="material-symbols-outlined text-primary">arrow_forward</span>

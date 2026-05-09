@@ -79,7 +79,7 @@ export default function Landing() {
           ].map((lang) => (
             <Link 
               key={lang.id}
-              href={`/languages/${lang.id}`}
+              href="/login"
               className="tactile-card p-5 flex items-center gap-6 cursor-pointer hover:border-primary group"
             >
               <div className={`w-10 h-10 ${lang.color} rounded-xl flex items-center justify-center ${lang.iconColor}`}>

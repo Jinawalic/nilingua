@@ -6,12 +6,25 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
+import { clearCurrentCourse } from '@/lib/current-course';
 
 export const dynamic = 'force-dynamic';
 
-const quizQuestions = [
+type QuizOption = {
+  id: number;
+  label: 'A' | 'B' | 'C' | 'D';
+  text: string;
+};
+
+type QuizQuestion = {
+  question: string;
+  options: QuizOption[];
+  answerLabel: 'A' | 'B' | 'C' | 'D';
+};
+
+const defaultQuizQuestions: QuizQuestion[] = [
   {
     question: 'Translate the phrase: "How are you?"',
     options: [
@@ -20,7 +33,7 @@ const quizQuestions = [
       { id: 2, text: 'Odaabo', label: 'C' },
       { id: 3, text: 'E ku ise', label: 'D' },
     ],
-    answerId: 0,
+    answerLabel: 'A',
   },
   {
     question: 'Translate the phrase: "Good morning"',
@@ -30,7 +43,7 @@ const quizQuestions = [
       { id: 2, text: 'Odaabo', label: 'C' },
       { id: 3, text: 'Mo wa daadaa', label: 'D' },
     ],
-    answerId: 1,
+    answerLabel: 'B',
   },
   {
     question: 'Translate the phrase: "Thank you"',
@@ -40,9 +53,77 @@ const quizQuestions = [
       { id: 2, text: 'O dara', label: 'C' },
       { id: 3, text: 'Ẹ kaaro', label: 'D' },
     ],
-    answerId: 1,
+    answerLabel: 'B',
   },
 ];
+
+function normalizeQuizRow(row: any): QuizQuestion[] {
+  const rawQuestions = Array.isArray(row?.questions) ? row.questions : [];
+
+  const formattedFromJson = rawQuestions
+    .map((item: any) => {
+      const question = String(item?.question || '').trim();
+      const options = item?.options || {};
+      const a = String(options?.a || '').trim();
+      const b = String(options?.b || '').trim();
+      const c = String(options?.c || '').trim();
+      const d = String(options?.d || '').trim();
+      const correctOption = String(item?.correctOption || '').trim().toUpperCase();
+
+      if (!question || !a || !b || !c || !d || !['A', 'B', 'C', 'D'].includes(correctOption)) {
+        return null;
+      }
+
+      return {
+        question,
+        options: [
+          { id: 0, text: a, label: 'A' as const },
+          { id: 1, text: b, label: 'B' as const },
+          { id: 2, text: c, label: 'C' as const },
+          { id: 3, text: d, label: 'D' as const },
+        ],
+        answerLabel: correctOption as 'A' | 'B' | 'C' | 'D',
+      };
+    })
+    .filter(Boolean) as QuizQuestion[];
+
+  if (formattedFromJson.length > 0) {
+    return formattedFromJson;
+  }
+
+  const question = String(row?.question || '').trim();
+  const optionA = String(row?.optionA || '').trim();
+  const optionB = String(row?.optionB || '').trim();
+  const optionC = String(row?.optionC || '').trim();
+  const optionD = String(row?.optionD || '').trim();
+  const answer = String(row?.answer || '').trim();
+
+  if (!question || !optionA || !optionB || !optionC || !optionD) {
+    return [];
+  }
+
+  let correctOption = answer.toUpperCase();
+  if (!['A', 'B', 'C', 'D'].includes(correctOption)) {
+    if (answer === optionA) correctOption = 'A';
+    else if (answer === optionB) correctOption = 'B';
+    else if (answer === optionC) correctOption = 'C';
+    else if (answer === optionD) correctOption = 'D';
+    else correctOption = 'A';
+  }
+
+  return [
+    {
+      question,
+      options: [
+        { id: 0, text: optionA, label: 'A' },
+        { id: 1, text: optionB, label: 'B' },
+        { id: 2, text: optionC, label: 'C' },
+        { id: 3, text: optionD, label: 'D' },
+      ],
+      answerLabel: correctOption as 'A' | 'B' | 'C' | 'D',
+    },
+  ];
+}
 
 export default function QuizPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -51,11 +132,48 @@ export default function QuizPage() {
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(defaultQuizQuestions);
+  const [loading, setLoading] = useState(true);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const language = 'igbo';
-  const level = 'basic';
+  const language = searchParams.get('language') ?? 'igbo';
+  const level = searchParams.get('level') ?? 'basic';
+
+  useEffect(() => {
+    async function loadQuiz() {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/quiz?language=${encodeURIComponent(language)}&level=${encodeURIComponent(level)}`);
+        if (!response.ok) {
+          throw new Error('Unable to load quiz questions');
+        }
+
+        const quizData = await response.json();
+        const quizzes = Array.isArray(quizData) ? quizData : [];
+        const firstQuiz = quizzes[0] ?? null;
+
+        if (firstQuiz) {
+          const parsedQuestions = normalizeQuizRow(firstQuiz);
+          if (parsedQuestions.length > 0) {
+            setQuizQuestions(parsedQuestions);
+          } else {
+            setQuizQuestions(defaultQuizQuestions);
+          }
+        } else {
+          setQuizQuestions(defaultQuizQuestions);
+        }
+      } catch (error) {
+        console.error('Quiz load failed:', error);
+        setQuizQuestions(defaultQuizQuestions);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadQuiz();
+  }, [language, level]);
 
   const currentQuestion = quizQuestions[currentIndex];
   const isLastQuestion = currentIndex === quizQuestions.length - 1;
@@ -68,7 +186,10 @@ export default function QuizPage() {
       timeoutRef.current = null;
     }
 
-    if (optionId === currentQuestion.answerId) {
+    const selectedLabel = quizQuestions[currentIndex]?.options?.find((item) => item.id === optionId)?.label;
+    const correctLabel = currentQuestion.answerLabel;
+
+    if (selectedLabel === correctLabel) {
       setScore((prev) => prev + 1);
       setToast({ type: 'success', message: 'Correct! Great job.' });
       setToastVisible(true);
@@ -76,7 +197,6 @@ export default function QuizPage() {
         setToastVisible(false);
       }, 2000);
     } else {
-      const correctLabel = currentQuestion.options.find((item) => item.id === currentQuestion.answerId)?.label ?? 'A';
       setToast({ type: 'error', message: `Wrong! the correct option is ${correctLabel}.` });
       setToastVisible(true);
       timeoutRef.current = setTimeout(() => {
@@ -99,7 +219,8 @@ export default function QuizPage() {
     }
 
     const totalQuestions = quizQuestions.length;
-    const finalScore = (selected === currentQuestion.answerId) ? score + 1 : score;
+    const selectedLabel = selected !== null ? currentQuestion.options[selected]?.label : null;
+    const finalScore = selectedLabel === currentQuestion.answerLabel ? score + 1 : score;
 
     setSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -108,6 +229,8 @@ export default function QuizPage() {
   };
 
   useEffect(() => {
+    clearCurrentCourse();
+
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -117,7 +240,7 @@ export default function QuizPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-surface">
-      <TopBar showBack onBack={() => router.back()} title="Quiz: Greetings" />
+      <TopBar showBack onBack={() => router.back()} title={`Quiz: ${language.charAt(0).toUpperCase() + language.slice(1)} ${level.charAt(0).toUpperCase() + level.slice(1)}`} />
 
       <main className="flex-1 pt-24 pb-32 px-5 max-w-[480px] mx-auto w-full relative">
         {toastVisible && toast && (
@@ -146,7 +269,7 @@ export default function QuizPage() {
           <p className="text-xs font-bold text-outline mt-2 uppercase tracking-widest text-right">Question {currentIndex + 1} of {quizQuestions.length}</p>
         </div>
 
-        <h2 className="text-2xl font-bold text-on-surface mb-8">{currentQuestion.question}</h2>
+        <h2 className="text-[15px] font-bold text-on-surface mb-8">{currentQuestion.question}</h2>
 
         <div className="grid grid-cols-1 gap-2">
           {currentQuestion.options.map((opt) => (
@@ -158,8 +281,8 @@ export default function QuizPage() {
                 : 'bg-white text-slate-900 border-outline-variant hover:bg-slate-50'
                 }`}
             >
-              <span className="font-bold text-lg">{opt.label}. </span>
-              <span className="text-lg font-semibold">{opt.text}</span>
+              <span className="font-bold text-[15px]">{opt.label}. </span>
+              <span className="text-[15px] font-semibold">{opt.text}</span>
             </button>
           ))}
         </div>

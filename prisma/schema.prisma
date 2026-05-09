@@ -6,33 +6,81 @@ datasource db {
   provider = "postgresql"
 }
 
+model Language {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
+model Level {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
 model User {
-  id       Int    @id @default(autoincrement())
-  name     String
-  email    String @unique
-  password String
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  progress   Progress[]
 }
 
 model Lesson {
-  id        Int    @id @default(autoincrement())
-  language  String
-  word      String
-  meaning   String
+  id           Int      @id @default(autoincrement())
+  language     String
+  level        String?
+  lessonNumber String?
+  lessonTitle  String?
+  word         String?
+  meaning      String?
+  entries      Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  progress     Progress[]
+
+  @@index([language])
+  @@index([language, level])
 }
 
 model Progress {
-  id       Int     @id @default(autoincrement())
-  userId   Int
-  lessonId Int
-  score    Float
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  lessonId  Int
+  score     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([lessonId])
 }
 
 model Quiz {
-  id       Int    @id @default(autoincrement())
-  question String
-  optionA  String
-  optionB  String
-  optionC  String
-  optionD  String
-  answer   String
+  id           Int      @id @default(autoincrement())
+  language     String?
+  level        String?
+  quizNumber   String?
+  question     String?
+  optionA      String?
+  optionB      String?
+  optionC      String?
+  optionD      String?
+  answer       String?
+  questions    Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+
+  @@index([language])
+  @@index([language, level])
 }

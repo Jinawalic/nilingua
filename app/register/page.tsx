@@ -15,15 +15,37 @@ export const dynamic = 'force-dynamic';
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    router.push('/home');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'Unable to create account');
+      }
+
+      router.push('/home');
+    } catch (registerError) {
+      setError(registerError instanceof Error ? registerError.message : 'Unable to create account');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,7 +66,9 @@ export default function RegisterPage() {
               <input 
                 type="text" 
                 placeholder="Your name"
-                className="w-full h-14 pl-12 pr-4 bg-white border-1 border-outline-variant rounded-xl focus:border-primary outline-none transition-all font-medium"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                className="w-full h-14 pl-12 pr-4 bg-white border-1 border-outline-variant rounded-xl focus:border-primary outline-none transition-all font-medium text-on-surface placeholder:text-on-surface-variant/50"
               />
             </div>
           </div>
@@ -56,7 +80,9 @@ export default function RegisterPage() {
               <input 
                 type="email" 
                 placeholder="your@email.com"
-                className="w-full h-14 pl-12 pr-4 bg-white border-1 border-outline-variant rounded-xl focus:border-primary outline-none transition-all font-medium"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="w-full h-14 pl-12 pr-4 bg-white border-1 border-outline-variant rounded-xl focus:border-primary outline-none transition-all font-medium text-on-surface placeholder:text-on-surface-variant/50"
               />
             </div>
           </div>
@@ -68,7 +94,9 @@ export default function RegisterPage() {
               <input 
                 type="password" 
                 placeholder="Create a password"
-                className="w-full h-14 pl-12 pr-4 bg-white border-1 border-outline-variant rounded-xl focus:border-primary outline-none transition-all font-medium"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="w-full h-14 pl-12 pr-4 bg-white border-1 border-outline-variant rounded-xl focus:border-primary outline-none transition-all font-medium text-on-surface placeholder:text-on-surface-variant/50"
               />
             </div>
           </div>
@@ -87,6 +115,7 @@ export default function RegisterPage() {
               'Create Account'
             )}
           </button>
+          {error ? <p className="text-sm font-medium text-red-600 text-center">{error}</p> : null}
         </form>
 
         <div className="mt-10 text-center">

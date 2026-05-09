@@ -5,11 +5,19 @@
 
 "use client";
 
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { TopBar } from '@/components/Navigation';
 
 export const dynamic = 'force-dynamic';
+
+type LessonData = {
+  id: number;
+  lessonNumber: string | null;
+  lessonTitle: string | null;
+  entries?: { text: string; meaning: string; pronunciation?: string }[];
+};
 
 export default function LevelSummaryPage() {
   const params = useParams();
@@ -17,6 +25,32 @@ export default function LevelSummaryPage() {
   const level = params.level as string;
   const displayLanguage = language.charAt(0).toUpperCase() + language.slice(1);
   const displayLevel = level.charAt(0).toUpperCase() + level.slice(1);
+
+  const [lessons, setLessons] = useState<LessonData[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    async function loadLessons() {
+      try {
+        const response = await fetch(`/api/lessons?language=${encodeURIComponent(language)}&level=${encodeURIComponent(level)}`);
+        if (!response.ok) {
+          throw new Error('Failed to load lessons');
+        }
+
+        const lessonsData = await response.json();
+        setLessons(Array.isArray(lessonsData) ? lessonsData : []);
+      } catch (error) {
+        console.error('Unable to load level statistics:', error);
+      } finally {
+        setIsLoaded(true);
+      }
+    }
+
+    loadLessons();
+  }, [language, level]);
+
+  const xpTotal = lessons.length * 20;
+  const wordsLearned = lessons.reduce((count: number, lesson) => count + (lesson.entries?.length ?? 0), 0);
 
   const nextLevel =
     level === 'basic' ? 'intermediate' :
@@ -53,11 +87,11 @@ export default function LevelSummaryPage() {
 
             <div className="grid grid-cols-2 gap-3 pt-4">
               <div className="rounded-xl bg-gradient-to-br from-orange-100 to-orange-50 p-4 text-center border border-orange-200">
-                <p className="text-xl font-bold text-orange-600">+100</p>
+                <p className="text-xl font-bold text-orange-600">+{xpTotal}</p>
                 <p className="text-xs text-orange-700 font-semibold uppercase tracking-wider mt-2">XP Total</p>
               </div>
               <div className="rounded-xl bg-gradient-to-br from-green-100 to-green-50 p-4 text-center border border-green-200">
-                <p className="text-xl font-bold text-green-600">15</p>
+                <p className="text-xl font-bold text-green-600">{wordsLearned}</p>
                 <p className="text-xs text-green-700 font-semibold uppercase tracking-wider mt-2">Words Learned</p>
               </div>
             </div>

@@ -15,15 +15,36 @@ export const dynamic = 'force-dynamic';
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    router.push('/home');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'Unable to log in');
+      }
+
+      router.push('/home');
+    } catch (loginError) {
+      setError(loginError instanceof Error ? loginError.message : 'Unable to log in');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,7 +65,9 @@ export default function LoginPage() {
               <input 
                 type="email" 
                 placeholder="Enter your email"
-                className="w-full h-14 pl-12 pr-4 bg-white border-1 border-outline-variant rounded-xl focus:border-primary outline-none transition-all font-medium"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="w-full h-14 pl-12 pr-4 bg-white border-1 border-outline-variant rounded-xl focus:border-primary outline-none transition-all font-medium text-on-surface placeholder:text-on-surface-variant/50"
               />
             </div>
           </div>
@@ -59,7 +82,9 @@ export default function LoginPage() {
               <input 
                 type="password" 
                 placeholder="Enter your password"
-                className="w-full h-14 pl-12 pr-4 bg-white border-1 border-outline-variant rounded-xl focus:border-primary outline-none transition-all font-medium"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="w-full h-14 pl-12 pr-4 bg-white border-1 border-outline-variant rounded-xl focus:border-primary outline-none transition-all font-medium text-on-surface placeholder:text-on-surface-variant/50"
               />
             </div>
           </div>
@@ -78,6 +103,7 @@ export default function LoginPage() {
               'Login'
             )}
           </button>
+          {error ? <p className="text-sm font-medium text-red-600 text-center">{error}</p> : null}
         </form>
 
         <div className="mt-5 text-center">
@@ -93,7 +119,7 @@ export default function LoginPage() {
           </button>
 
           <p className="text-on-surface-variant">
-            Don't have an account? <Link href="/register" className="text-primary font-bold">Register Now</Link>
+            Don&apos;t have an account? <Link href="/register" className="text-primary font-bold">Register Now</Link>
           </p>
         </div>
       </main>

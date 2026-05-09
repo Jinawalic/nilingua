@@ -6,101 +6,26 @@
 "use client";
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
 import { TopBar } from '@/components/Navigation';
+import { saveCurrentCourse } from '@/lib/current-course';
 
 export const dynamic = 'force-dynamic';
 
-const levelUnits: Record<string, Array<{ id: string; title: string; description: string }>> = {
-  basic: [
-    { id: 'introduction', title: 'Introduction', description: 'Start with the core greetings and basic words.' },
-    { id: 'basic-greetings', title: 'Basic Greetings', description: 'Learn how to greet people in everyday conversation.' },
-    { id: 'family-members', title: 'Family Members', description: 'Name family members and practice relationships.' },
-    { id: 'numbers-1-10', title: 'Numbers 1-10', description: 'Count and use numbers in basic sentences.' },
-    { id: 'common-phrases', title: 'Common Phrases', description: 'Speak simple but useful everyday phrases.' },
-  ],
-  intermediate: [
-    { id: 'conversation', title: 'Conversation', description: 'Expand your vocabulary for daily dialogue.' },
-    { id: 'travel', title: 'Travel Essentials', description: 'Learn phrases for moving around town.' },
-    { id: 'shopping', title: 'Shopping', description: 'Practice buying items and asking prices.' },
-  ],
-  advanced: [
-    { id: 'idioms', title: 'Idioms', description: 'Master expressions used by native speakers.' },
-    { id: 'culture', title: 'Culture', description: 'Dive into cultural context and meaning.' },
-  ],
+type LessonEntry = {
+  text: string;
+  meaning: string;
+  pronunciation?: string;
 };
 
-const lessonContent: Record<string, Record<string, Array<{ word: string; meaning: string; pronunciation: string }>>> = {
-  igbo: {
-    basic: [
-      { word: 'Kedu', meaning: 'Hello/How are you?', pronunciation: 'KAY-doo' },
-      { word: 'Daalụ', meaning: 'Thank you', pronunciation: 'DAH-loo' },
-      { word: 'Ọma', meaning: 'Good/Well', pronunciation: 'OH-mah' },
-      { word: 'Ego', meaning: 'Money', pronunciation: 'EH-go' },
-      { word: 'Akwụ', meaning: 'Hand', pronunciation: 'AH-kwoo' },
-    ],
-    intermediate: [
-      { word: 'Ihe mma', meaning: 'Something good', pronunciation: 'EE-hay MAH' },
-      { word: 'Ọ daalụ', meaning: 'It is good', pronunciation: 'OH DAH-loo' },
-      { word: 'Ụta', meaning: 'Song', pronunciation: 'OO-tah' },
-      { word: 'Ezigbo ụbọchị', meaning: 'Good day', pronunciation: 'eh-ZEE-gbo OO-bo-chee' },
-      { word: 'Amụ', meaning: 'Learn', pronunciation: 'AH-moo' },
-    ],
-    advanced: [
-      { word: 'Nchọ ozizi', meaning: 'Spiritual guidance', pronunciation: 'n-CHO oh-ZEE-zee' },
-      { word: 'Ụlọ nri', meaning: 'Restaurant/dining house', pronunciation: 'OO-lo n-REE' },
-      { word: 'Echiche', meaning: 'Thought/reflection', pronunciation: 'eh-CHEE-chay' },
-      { word: 'Ịgbanwụ', meaning: 'To change/transform', pronunciation: 'ee-gban-WOO' },
-      { word: 'Ohere', meaning: 'Opportunity', pronunciation: 'oh-HEH-ray' },
-    ],
-  },
-  hausa: {
-    basic: [
-      { word: 'Sannu', meaning: 'Hello', pronunciation: 'SAHN-noo' },
-      { word: 'Na gida', meaning: 'I am fine', pronunciation: 'nah GEE-dah' },
-      { word: 'Godiya', meaning: 'Thank you', pronunciation: 'go-DEE-yah' },
-      { word: 'Kyau', meaning: 'Good/OK', pronunciation: 'KYY-ow' },
-      { word: 'Gida', meaning: 'Home', pronunciation: 'GEE-dah' },
-    ],
-    intermediate: [
-      { word: 'Ina kwana', meaning: 'Where are you going?', pronunciation: 'ee-nah KWH-nah' },
-      { word: 'Aiki', meaning: 'Work/Job', pronunciation: 'AH-ee-kee' },
-      { word: 'Yara', meaning: 'Child', pronunciation: 'YAH-rah' },
-      { word: 'Waje', meaning: 'Outside', pronunciation: 'WAH-jay' },
-      { word: 'Dare', meaning: 'Night', pronunciation: 'DAH-ray' },
-    ],
-    advanced: [
-      { word: 'Tunani', meaning: 'To think/consider', pronunciation: 'too-NAH-nee' },
-      { word: 'Tattalin', meaning: 'Business/commerce', pronunciation: 'tah-TAH-lin' },
-      { word: 'Jizyar', meaning: 'Responsibility', pronunciation: 'jee-ZYAR' },
-      { word: 'Zaman', meaning: 'Time/era', pronunciation: 'ZAH-man' },
-      { word: 'Hankali', meaning: 'Wisdom/understanding', pronunciation: 'hahn-KAH-lee' },
-    ],
-  },
-  yoruba: {
-    basic: [
-      { word: 'Bawo', meaning: 'Hello', pronunciation: 'BAH-wo' },
-      { word: 'Pẹlẹ o', meaning: 'Take it easy', pronunciation: 'PEH-leh oh' },
-      { word: 'E ṣeun', meaning: 'Thank you', pronunciation: 'eh SHEH-oon' },
-      { word: 'Ẹ kaabo', meaning: 'Welcome', pronunciation: 'eh KAH-bo' },
-      { word: 'Ile', meaning: 'Home', pronunciation: 'EE-leh' },
-    ],
-    intermediate: [
-      { word: 'Ire', meaning: 'Good/blessing', pronunciation: 'EE-reh' },
-      { word: 'Iṣẹ', meaning: 'Work', pronunciation: 'ee-SHEH' },
-      { word: 'Omo', meaning: 'Child', pronunciation: 'OH-mo' },
-      { word: 'Ojo', meaning: 'Day', pronunciation: 'OH-jo' },
-      { word: 'Ẹkọ', meaning: 'Learning/education', pronunciation: 'EH-ko' },
-    ],
-    advanced: [
-      { word: 'Awọn irunmọlẹ', meaning: 'Spiritual beings', pronunciation: 'ah-WON ee-roon-MOH-leh' },
-      { word: 'Igbagbo', meaning: 'Belief/faith', pronunciation: 'ee-GBAH-gbo' },
-      { word: 'Oruko', meaning: 'Name/identity', pronunciation: 'oh-ROO-ko' },
-      { word: 'Ìran', meaning: 'Generation/lineage', pronunciation: 'ee-RAHN' },
-      { word: 'Ìwọ', meaning: 'Respect/honor', pronunciation: 'ee-WOH' },
-    ],
-  },
+type LessonData = {
+  id: number;
+  lessonNumber: string | null;
+  lessonTitle: string | null;
+  entries?: LessonEntry[];
+  word?: string | null;
+  meaning?: string | null;
 };
 
 export default function LearningProgressPage() {
@@ -113,31 +38,100 @@ export default function LearningProgressPage() {
   const displayLanguage = language.charAt(0).toUpperCase() + language.slice(1);
   const displayLevel = level.charAt(0).toUpperCase() + level.slice(1);
 
-  const lessonId = searchParams.get('lesson') || levelUnits[level]?.[0]?.id || 'introduction';
-  const lessonsInLevel = levelUnits[level] || levelUnits.basic;
-  const lessonIndex = lessonsInLevel.findIndex((lesson) => lesson.id === lessonId) + 1;
-  const selectedLesson = lessonsInLevel.find((lesson) => lesson.id === lessonId) || lessonsInLevel[0];
-  const currentLanguageLessons = lessonContent[language.toLowerCase()] || lessonContent.igbo;
-  const currentLevelContent = currentLanguageLessons[level.toLowerCase()] || currentLanguageLessons.basic;
-
+  const [lessons, setLessons] = useState<LessonData[]>([]);
+  const [selectedLesson, setSelectedLesson] = useState<LessonData | null>(null);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const totalCards = currentLevelContent.length;
-  const progress = ((currentCardIndex + 1) / totalCards) * 100;
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadLessons() {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/lessons?language=${encodeURIComponent(language)}&level=${encodeURIComponent(level)}`);
+        if (!response.ok) {
+          throw new Error('Failed to load lessons');
+        }
+
+        const lessonsData = await response.json();
+        const lessonList: LessonData[] = Array.isArray(lessonsData) ? lessonsData : [];
+
+        setLessons(lessonList);
+
+        const lessonParam = searchParams.get('lesson');
+        const foundLesson = lessonParam ? lessonList.find((lesson) => String(lesson.id) === lessonParam) : null;
+        setSelectedLesson(foundLesson ?? lessonList[0] ?? null);
+        setCurrentCardIndex(0);
+      } catch (error) {
+        console.error(error);
+        setLessons([]);
+        setSelectedLesson(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadLessons();
+  }, [language, level, searchParams]);
+
+  const lessonId = searchParams.get('lesson') || String(selectedLesson?.id ?? '');
+  const lessonIndex = selectedLesson ? lessons.findIndex((lesson) => lesson.id === selectedLesson.id) + 1 : 0;
+  const lessonTitle = selectedLesson?.lessonTitle ?? (selectedLesson?.lessonNumber ?? `Lesson ${lessonIndex}`);
+  const lessonDescription = selectedLesson?.meaning ? `Learn the word ${selectedLesson.meaning}` : 'Continue learning in this lesson.';
+
+  const cards = selectedLesson?.entries && Array.isArray(selectedLesson.entries) && selectedLesson.entries.length > 0
+    ? selectedLesson.entries
+    : selectedLesson
+      ? [{ text: selectedLesson.word || lessonTitle, meaning: selectedLesson.meaning || 'Continue learning', pronunciation: '' }]
+      : [];
+
+  const totalCards = cards.length;
+  const progress = totalCards > 0 ? ((currentCardIndex + 1) / totalCards) * 100 : 0;
+  const currentCard = cards[currentCardIndex] ?? { text: '', meaning: '', pronunciation: '' };
+  const isLastCard = currentCardIndex === totalCards - 1;
+
+  useEffect(() => {
+    if (!selectedLesson) {
+      return;
+    }
+
+    saveCurrentCourse({
+      language,
+      level,
+      lessonId,
+      lessonTitle,
+      displayLanguage,
+      displayLevel,
+      resumeUrl: `${window.location.pathname}${window.location.search}`,
+      progressPercent: Math.min(100, Math.max(0, Math.round(progress))),
+      updatedAt: Date.now(),
+    });
+  }, [displayLanguage, displayLevel, language, level, lessonId, lessonTitle, progress, selectedLesson]);
 
   const handleNext = () => {
     if (currentCardIndex < totalCards - 1) {
-      setCurrentCardIndex(currentCardIndex + 1);
+      setCurrentCardIndex((current) => current + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentCardIndex > 0) {
-      setCurrentCardIndex(currentCardIndex - 1);
+      setCurrentCardIndex((current) => current - 1);
     }
   };
 
-  const isLastCard = currentCardIndex === totalCards - 1;
-  const currentCard = currentLevelContent[currentCardIndex];
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-surface">
+        <TopBar showBack onBack={() => router.back()} title={`${displayLanguage} - ${displayLevel}`} homeLink />
+        <main className="mt-20 pb-2 px-5 max-w-[480px] mx-auto w-full">
+          <div className="space-y-4">
+            <div className="h-28 rounded-xl bg-surface-container-low animate-pulse" />
+            <div className="h-48 rounded-xl bg-surface-container-low animate-pulse" />
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-surface">
@@ -148,8 +142,7 @@ export default function LearningProgressPage() {
           <div className="flex items-center justify-between gap-2">
             <div>
               <p className="text-sm text-on-surface-variant uppercase tracking-[0.26em]">Lesson {lessonIndex}</p>
-              <h1 className="text-xl font-bold text-on-surface">{selectedLesson.title}</h1>
-              <p className="text-sm text-on-surface-variant">{selectedLesson.description}</p>
+              <h1 className="text-[15px] font-bold text-on-surface">{lessonTitle}</h1>
             </div>
             <div className="rounded-xl bg-primary text-white px-4 py-2 text-sm font-bold">{displayLevel}</div>
           </div>
@@ -158,13 +151,13 @@ export default function LearningProgressPage() {
         <div className="space-y-3">
           <div className="rounded-xl border border-outline-variant bg-white p-4 text-center">
             <p className="text-sm text-on-surface-variant uppercase tracking-widest mb-3">Word</p>
-            <p className="text-xl font-bold text-on-surface">{currentCard.word}</p>
+            <p className="text-[15px] font-semibold text-on-surface">{currentCard.text}</p>
             <p className="text-sm text-on-surface-variant italic mt-4">{currentCard.pronunciation}</p>
           </div>
 
           <div className="rounded-xl border border-secondary/20 bg-secondary-container/20 p-4 text-center">
             <p className="text-sm text-on-surface-variant uppercase tracking-widest mb-3">Meaning</p>
-            <p className="text-xl font-bold text-on-surface">{currentCard.meaning}</p>
+            <p className="text-[15px] font-semibold text-on-surface">{currentCard.meaning}</p>
           </div>
         </div>
 
@@ -187,9 +180,9 @@ export default function LearningProgressPage() {
           </button>
         </div>
 
-        {isLastCard && (
+        {isLastCard && selectedLesson && (
           <Link
-            href={`/languages/${language}/${level}/complete?lesson=${lessonId}`}
+            href={`/languages/${language}/${level}/complete?lesson=${selectedLesson.id}`}
             className="w-full rounded-xl bg-primary px-6 py-4 text-center font-bold uppercase tracking-[0.24em] text-white hover:shadow-sm transition-all flex items-center justify-center gap-2"
           >
             Finish Learning
